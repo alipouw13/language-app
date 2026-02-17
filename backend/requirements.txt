@@ -1,5 +1,27 @@
-fastapi
-uvicorn
-requests
-python-dotenv
-openai
+# Core
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Database
+sqlalchemy[asyncio]>=2.0.25
+asyncpg>=0.29.0
+
+# Azure OpenAI
+openai>=1.12.0
+
+# Azure Identity (for Entra authentication)
+azure-identity>=1.15.0
+
+# Azure Speech (optional — install when using voice features)
+# azure-cognitiveservices-speech>=1.35.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# WebSockets (included with uvicorn[standard])
+websockets>=12.0
+
+# HTTP client
+httpx>=0.26.0

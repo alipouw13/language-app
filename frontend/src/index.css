@@ -1,0 +1,230 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f7fa;
+  color: #1a1a2e;
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e0e4ea;
+  padding-bottom: 1rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+nav a:hover, nav a.active {
+  background: #4361ee;
+  color: #fff;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+button {
+  background: #4361ee;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #3a56d4;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row > * {
+  flex: 1;
+}
+
+.error {
+  color: #dc3545;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.loading {
+  color: #666;
+  font-style: italic;
+}
+
+.exercise-card {
+  background: #f8f9fc;
+  border: 1px solid #e0e4ea;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.exercise-card .type-badge {
+  display: inline-block;
+  background: #4361ee;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.chat-window {
+  border: 1px solid #ccd;
+  border-radius: 8px;
+  height: 350px;
+  overflow-y: auto;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+
+.chat-bubble {
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  max-width: 80%;
+  line-height: 1.5;
+}
+
+.chat-bubble.user {
+  background: #4361ee;
+  color: #fff;
+  margin-left: auto;
+}
+
+.chat-bubble.assistant {
+  background: #e8ecf4;
+  color: #1a1a2e;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-input-row input {
+  flex: 1;
+}
+
+.vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.vocab-table th, .vocab-table td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e0e4ea;
+}
+
+.vocab-table th {
+  font-size: 0.85rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.lesson-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lesson-list-item:hover {
+  background: #f0f2f8;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-fr { background: #d4edda; color: #155724; }
+.badge-es { background: #fff3cd; color: #856404; }
+.badge-en { background: #cce5ff; color: #004085; }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

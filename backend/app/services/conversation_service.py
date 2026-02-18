@@ -14,12 +14,31 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.db_models import Conversation, ConversationTurn
+from app.models.db_models import Conversation, ConversationTurn, User
 from app.models.pydantic_models import ConversationStartRequest
 from app.services.llm_service import chat_completion
 
 LANGUAGE_NAMES = {"en": "English", "fr": "French", "es": "Spanish"}
 MEMORY_WINDOW = 10  # number of recent turns sent to LLM
+
+
+async def _get_or_create_user(db: AsyncSession, user_id: uuid.UUID | None) -> uuid.UUID:
+    """Get an existing user or create a new anonymous user."""
+    if user_id:
+        # Check if user exists
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        if user:
+            return user.id
+    
+    # Create a new anonymous user
+    new_user = User(
+        display_name="Anonymous Learner",
+        native_language="en",
+    )
+    db.add(new_user)
+    await db.flush()
+    return new_user.id
 
 
 def _build_system_prompt(language: str, scenario: str | None) -> str:
@@ -41,7 +60,7 @@ async def start_conversation(
     db: AsyncSession,
 ) -> Conversation:
     """Create a new conversation session."""
-    user_id = req.user_id or uuid.uuid4()
+    user_id = await _get_or_create_user(db, req.user_id)
     conv = Conversation(
         user_id=user_id,
         target_language=req.target_language,

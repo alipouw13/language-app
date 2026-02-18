@@ -50,7 +50,7 @@ Browse saved worksheets and conversation transcripts with pagination.
 
 - **Node.js** 18+ and **Python** 3.11+
 - **PostgreSQL** (Azure or local)
-- **Azure OpenAI** with GPT-4 deployment
+- **Azure OpenAI** with GPT-4.1-mini (or other) deployment
 
 ## Quick Start
 
@@ -92,7 +92,7 @@ Create `backend/.env`:
 DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/language_app
 AZURE_OPENAI_API_KEY=your-key
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_DEPLOYMENT=gpt-4
+AZURE_OPENAI_DEPLOYMENT=gpt-4.1-mini
 ```
 
 For Azure PostgreSQL with Entra auth, use `az login` and configure your identity.

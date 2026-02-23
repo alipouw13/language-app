@@ -1,9 +1,12 @@
 """
-Speech service — Azure Speech SDK integration.
+Speech service — Azure AI Foundry (OpenAI-compatible) integration.
 
 Provides async wrappers around:
-  - Speech-to-text (STT)
-  - Text-to-speech (TTS)
+  - Speech-to-text (STT) via gpt-4o-transcribe-diarize
+  - Text-to-speech (TTS) via gpt-4o-mini-tts
+
+Uses Entra ID (DefaultAzureCredential) for authentication — key auth is
+not supported.
 
 These are called from the conversation WebSocket handler.
 """
@@ -12,118 +15,96 @@ from __future__ import annotations
 
 import io
 import logging
-from typing import AsyncGenerator
+
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from openai import AzureOpenAI
 
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-# Lazy import — azure-cognitiveservices-speech is an optional heavy dependency.
-_speech_sdk = None
-
-
-def _ensure_sdk():
-    global _speech_sdk
-    if _speech_sdk is None:
-        try:
-            import azure.cognitiveservices.speech as speechsdk
-            _speech_sdk = speechsdk
-        except ImportError:
-            raise RuntimeError(
-                "azure-cognitiveservices-speech is not installed. "
-                "Install it with: pip install azure-cognitiveservices-speech"
-            )
-    return _speech_sdk
-
-
+# Language → voice mapping for TTS (OpenAI voice names)
 LANGUAGE_VOICE_MAP = {
-    "en": "en-US-JennyNeural",
-    "fr": "fr-FR-DeniseNeural",
-    "es": "es-ES-ElviraNeural",
+    "en": "alloy",
+    "fr": "nova",
+    "es": "shimmer",
 }
 
 LANGUAGE_LOCALE_MAP = {
-    "en": "en-US",
-    "fr": "fr-FR",
-    "es": "es-ES",
+    "en": "en",
+    "fr": "fr",
+    "es": "es",
 }
 
+# Module-level cached client
+_client: AzureOpenAI | None = None
 
-def _get_speech_config():
-    """Build an Azure Speech config using Entra (DefaultAzureCredential) authentication."""
-    speechsdk = _ensure_sdk()
+
+def _get_client() -> AzureOpenAI:
+    """Return (and cache) an AzureOpenAI client authenticated via Entra ID."""
+    global _client
+    if _client is not None:
+        return _client
+
     s = get_settings()
-    if not s.azure_speech_endpoint:
-        raise ValueError("AZURE_SPEECH_ENDPOINT is not configured")
-    
-    # Use DefaultAzureCredential for Entra authentication
-    try:
-        from azure.identity import DefaultAzureCredential
-    except ImportError:
-        raise RuntimeError(
-            "azure-identity is not installed. "
-            "Install it with: pip install azure-identity"
-        )
-    
+    if not s.azure_foundry_endpoint:
+        raise ValueError("AZURE_FOUNDRY_ENDPOINT is not configured")
+
     credential = DefaultAzureCredential()
-    token = credential.get_token("https://cognitiveservices.azure.com/.default")
-    
-    # Create speech config with authorization token
-    speech_config = speechsdk.SpeechConfig(
-        auth_token=token.token,
-        region=s.azure_speech_region,
+    token_provider = get_bearer_token_provider(
+        credential, "https://cognitiveservices.azure.com/.default"
     )
-    return speech_config
+
+    _client = AzureOpenAI(
+        azure_endpoint=s.azure_foundry_endpoint.rstrip("/"),
+        azure_ad_token_provider=token_provider,
+        api_version="2025-01-01-preview",
+    )
+    return _client
 
 
 async def speech_to_text(audio_bytes: bytes, language: str = "en") -> str:
-    """Recognise speech from raw WAV/PCM audio bytes.
+    """Transcribe speech from audio bytes using gpt-4o-transcribe-diarize.
 
     Returns the recognised text string.
     """
-    speechsdk = _ensure_sdk()
-    speech_config = _get_speech_config()
-    speech_config.speech_recognition_language = LANGUAGE_LOCALE_MAP.get(language, "en-US")
+    s = get_settings()
+    client = _get_client()
+    locale = LANGUAGE_LOCALE_MAP.get(language, "en")
 
-    # Push stream from bytes
-    stream = speechsdk.audio.PushAudioInputStream()
-    stream.write(audio_bytes)
-    stream.close()
+    audio_file = io.BytesIO(audio_bytes)
+    audio_file.name = "audio.wav"
 
-    audio_config = speechsdk.audio.AudioConfig(stream=stream)
-    recognizer = speechsdk.SpeechRecognizer(
-        speech_config=speech_config,
-        audio_config=audio_config,
+    logger.info("STT request — model=%s language=%s", s.azure_speech_to_text_model_name, locale)
+
+    transcription = client.audio.transcriptions.create(
+        model=s.azure_speech_to_text_model_name,
+        file=audio_file,
+        language=locale,
     )
-    result = recognizer.recognize_once()
 
-    if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-        return result.text
-    elif result.reason == speechsdk.ResultReason.NoMatch:
-        return ""
-    else:
-        logger.warning("Speech recognition failed: %s", result.reason)
-        raise RuntimeError(f"Speech recognition failed: {result.reason}")
+    text = transcription.text or ""
+    logger.info("STT result: %s", text[:120])
+    return text
 
 
 async def text_to_speech(text: str, language: str = "en") -> bytes:
-    """Synthesise speech from text.
+    """Synthesise speech from text using gpt-4o-mini-tts.
 
-    Returns WAV audio bytes.
+    Returns audio bytes (mp3).
     """
-    speechsdk = _ensure_sdk()
-    speech_config = _get_speech_config()
-    voice = LANGUAGE_VOICE_MAP.get(language, "en-US-JennyNeural")
-    speech_config.speech_synthesis_voice_name = voice
+    s = get_settings()
+    client = _get_client()
+    voice = LANGUAGE_VOICE_MAP.get(language, "alloy")
 
-    synthesizer = speechsdk.SpeechSynthesizer(
-        speech_config=speech_config,
-        audio_config=None,  # we'll capture the bytes directly
+    logger.info("TTS request — model=%s voice=%s", s.azure_text_to_speech_model_name, voice)
+
+    response = client.audio.speech.create(
+        model=s.azure_text_to_speech_model_name,
+        voice=voice,
+        input=text,
     )
-    result = synthesizer.speak_text(text)
 
-    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        return result.audio_data
-    else:
-        logger.warning("Speech synthesis failed: %s", result.reason)
-        raise RuntimeError(f"Speech synthesis failed: {result.reason}")
+    audio_data = response.content
+    logger.info("TTS result: %d bytes", len(audio_data))
+    return audio_data

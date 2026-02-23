@@ -32,11 +32,14 @@ class Settings(BaseSettings):
     azure_speech_endpoint: str = ""
     azure_speech_region: str = "eastus"
 
-    # --- Azure AI Foundry (speech model endpoints) ---
+    # --- Azure AI Foundry (speech model endpoints — Entra auth only) ---
     azure_foundry_endpoint: str = ""
-    azure_speech_to_text_key: str = ""
     azure_speech_to_text_model_name: str = ""
     azure_text_to_speech_model_name: str = ""
+
+    # --- Azure PostgreSQL (for auto-start & firewall management) ---
+    azure_pg_resource_group: str = ""
+    azure_pg_server_name: str = ""
 
     # --- App ---
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]

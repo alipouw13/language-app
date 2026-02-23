@@ -61,5 +61,17 @@ export function useConversationStore() {
     setState({ conversationId: null, turns: [], loading: false, error: null });
   }, []);
 
-  return { ...state, start, send, reset };
+  const addTurn = useCallback((turn: ConversationTurn) => {
+    setState((s) => ({ ...s, turns: [...s.turns, turn] }));
+  }, []);
+
+  const setLoading = useCallback((loading: boolean) => {
+    setState((s) => ({ ...s, loading }));
+  }, []);
+
+  const setError = useCallback((error: string | null) => {
+    setState((s) => ({ ...s, error }));
+  }, []);
+
+  return { ...state, start, send, reset, addTurn, setLoading, setError };
 }

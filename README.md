@@ -97,6 +97,25 @@ AZURE_OPENAI_DEPLOYMENT=gpt-4.1-mini
 
 For Azure PostgreSQL with Entra auth, use `az login` and configure your identity.
 
+### Azure PostgreSQL Setup
+
+If using an Azure-hosted PostgreSQL Flexible Server, ensure the server is running and your IP is allowed:
+
+```bash
+# Start the server (if stopped)
+az postgres flexible-server start --resource-group <your-rg> --name <your-server>
+
+# Add your current IP to the firewall allow list
+az postgres flexible-server firewall-rule create \
+  --resource-group <your-rg> \
+  --name <your-server> \
+  --rule-name AllowMyIP \
+  --start-ip-address <your-ip> \
+  --end-ip-address <your-ip>
+```
+
+You can find your public IP with `curl https://api.ipify.org` (or `Invoke-WebRequest https://api.ipify.org` on PowerShell).
+
 ## API Endpoints
 
 | Method | Endpoint | Description |

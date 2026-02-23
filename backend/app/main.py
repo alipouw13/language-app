@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import conversations, lessons, worksheets
 from app.config import get_settings
-from app.db.session import engine
+from app.db.session import init_db
 from app.models.db_models import Base
 
 settings = get_settings()
@@ -47,9 +47,13 @@ app.include_router(lessons.router)
 
 @app.on_event("startup")
 async def on_startup():
-    """Create tables if they don't exist (dev convenience).
-    In production, use Alembic migrations instead.
+    """Initialise DB connection (with retries) and create tables if needed.
+    In production, use Alembic migrations instead of create_all.
     """
+    await init_db()
+
+    # Import engine after init_db has populated it
+    from app.db.session import engine
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

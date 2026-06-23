@@ -38,10 +38,12 @@ real conversations by voice or text. Everything is secured with **Microsoft Entr
 > Editable source: [`docs/architecture.drawio`](docs/architecture.drawio) (open in
 > [draw.io](https://www.drawio.com/)). Built with the
 > [drawio-skill](https://github.com/Agents365-ai/drawio-skill) using the official
-> **Azure Architecture Center** service icons. The presentation/application tiers show a
-> recommended Azure hosting topology (Static Web Apps + App Service); the app code itself is
-> a plain React SPA + FastAPI and can run anywhere. Monitoring and security services are the
-> recommended platform components for a production deployment.
+> **Microsoft Fabric** icons ([@fabric-msft/svg-icons](https://github.com/FabricTools/fabric-icons))
+> for OneLake, Real-Time Intelligence / Eventhouse and Power BI, and the **Azure Architecture
+> Center** icons for the Azure services. The presentation/application tiers show a recommended
+> Azure hosting topology (Static Web Apps + App Service); the app code itself is a plain React
+> SPA + FastAPI and can run anywhere. Monitoring and security services are the recommended
+> platform components for a production deployment.
 
 | Layer | Technology |
 |-------|------------|
@@ -353,7 +355,7 @@ frontend/src/
 ├── services/      # API + WebSocket clients
 └── state/
 docs/
-├── architecture.drawio   # Editable architecture diagram (draw.io, official Azure icons)
+├── architecture.drawio   # Editable architecture diagram (draw.io, Fabric + Azure icons)
 └── architecture.svg      # Rendered diagram (self-contained, embedded in this README)
 ```
 

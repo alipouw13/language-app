@@ -98,6 +98,14 @@ class TranslationResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# Speech (text-to-speech)                                                      #
+# --------------------------------------------------------------------------- #
+class TTSRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=500)
+    language: str = Field("en", pattern=LANG_PATTERN)
+
+
+# --------------------------------------------------------------------------- #
 # Conversation                                                                 #
 # --------------------------------------------------------------------------- #
 class ConversationStartRequest(BaseModel):

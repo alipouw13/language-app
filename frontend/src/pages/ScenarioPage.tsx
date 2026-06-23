@@ -113,7 +113,9 @@ export default function ScenarioPage() {
       </Card>
 
       {error && <Alert>{error}</Alert>}
-      {worksheet && <WorksheetView worksheet={worksheet} exerciseIds={exerciseIds} />}
+      {worksheet && (
+        <WorksheetView worksheet={worksheet} lang={language} exerciseIds={exerciseIds} />
+      )}
     </div>
   );
 }

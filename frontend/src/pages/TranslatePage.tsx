@@ -3,6 +3,7 @@ import type { LangCode } from '../constants';
 import { LANGUAGES } from '../constants';
 import type { TranslationResult } from '../types';
 import { translateText } from '../services/api';
+import InteractiveText from '../components/InteractiveText';
 import { Alert, Button, Card, Field, LanguageBadge, Select, Spinner, TextArea } from '../components/ui';
 
 const SOURCES: { code: 'auto' | LangCode; label: string }[] = [
@@ -107,7 +108,9 @@ export default function TranslatePage() {
             {Object.entries(result.translations).map(([code, value]) => (
               <div key={code} className="translation-item">
                 <LanguageBadge code={code} />
-                <p>{value}</p>
+                <p>
+                  <InteractiveText text={value} lang={code} />
+                </p>
               </div>
             ))}
           </div>

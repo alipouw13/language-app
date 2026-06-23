@@ -631,6 +631,55 @@ textarea.control {
   margin: 0.6rem 0 1.2rem;
 }
 
+/* ------------------------------------------------------------------ Interactive words */
+.iword {
+  position: relative;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.12s, color 0.12s;
+  outline: none;
+}
+.iword:hover,
+.iword:focus-visible {
+  background: var(--primary-50);
+  color: var(--primary-600);
+  text-decoration: underline dotted var(--primary);
+  text-underline-offset: 2px;
+}
+.iword.speaking {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+}
+.iword-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.28rem 0.5rem;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.iword-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text);
+}
+
 /* ------------------------------------------------------------------ Responsive */
 @media (max-width: 760px) {
   .appbar {

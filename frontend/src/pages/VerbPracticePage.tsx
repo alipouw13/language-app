@@ -153,7 +153,9 @@ export default function VerbPracticePage() {
       </Card>
 
       {error && <Alert>{error}</Alert>}
-      {worksheet && <WorksheetView worksheet={worksheet} exerciseIds={exerciseIds} />}
+      {worksheet && (
+        <WorksheetView worksheet={worksheet} lang={language} exerciseIds={exerciseIds} />
+      )}
     </div>
   );
 }

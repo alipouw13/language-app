@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import type { ExerciseEvaluation, Worksheet } from '../types';
 import { evaluateExercise } from '../services/api';
+import InteractiveText from './InteractiveText';
 import { Badge, Button, Card, TextInput } from './ui';
 
 interface Props {
   worksheet: Worksheet;
+  /** Language of the target-language content (for hover-translate + speak). */
+  lang: string;
   exerciseIds?: string[];
 }
 
 /** Renders a generated worksheet, with inline exercise checking when ids exist. */
-export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
+export default function WorksheetView({ worksheet, lang, exerciseIds = [] }: Props) {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [evals, setEvals] = useState<Record<number, ExerciseEvaluation>>({});
   const [busy, setBusy] = useState<number | null>(null);
@@ -35,7 +38,9 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
     <Card className="worksheet">
       <header className="worksheet-head">
         {worksheet.verb && <Badge>verb · {worksheet.verb}</Badge>}
-        <h2>{worksheet.scenario_summary}</h2>
+        <h2>
+          <InteractiveText text={worksheet.scenario_summary} lang={lang} />
+        </h2>
         <p className="muted">
           <strong>Grammar focus:</strong> {worksheet.grammar_focus}
         </p>
@@ -43,7 +48,9 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
 
       <section>
         <h3>Explanation</h3>
-        <p className="prose">{worksheet.explanations}</p>
+        <p className="prose">
+          <InteractiveText text={worksheet.explanations} lang={lang} />
+        </p>
       </section>
 
       {worksheet.conjugation_table && worksheet.conjugation_table.length > 0 && (
@@ -60,9 +67,13 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
             <tbody>
               {worksheet.conjugation_table.map((row, i) => (
                 <tr key={i}>
-                  <td>{row.pronoun}</td>
                   <td>
-                    <strong>{row.form}</strong>
+                    <InteractiveText text={row.pronoun} lang={lang} />
+                  </td>
+                  <td>
+                    <strong>
+                      <InteractiveText text={row.form} lang={lang} />
+                    </strong>
                   </td>
                   <td className="muted">{row.translation}</td>
                 </tr>
@@ -86,11 +97,15 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
             {worksheet.vocabulary.map((v, i) => (
               <tr key={i}>
                 <td>
-                  <strong>{v.word}</strong>
+                  <strong>
+                    <InteractiveText text={v.word} lang={lang} />
+                  </strong>
                 </td>
                 <td>{v.translation}</td>
                 <td>
-                  <em className="muted">{v.example_sentence}</em>
+                  <em className="muted">
+                    <InteractiveText text={v.example_sentence} lang={lang} />
+                  </em>
                 </td>
               </tr>
             ))}
@@ -103,7 +118,9 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
         {worksheet.exercises.map((ex, i) => (
           <div key={i} className="exercise">
             <span className="type-badge">{ex.type.replace('_', ' ')}</span>
-            <p className="exercise-q">{ex.question}</p>
+            <p className="exercise-q">
+              <InteractiveText text={ex.question} lang={lang} />
+            </p>
             {ex.hint && <p className="field-hint">Hint: {ex.hint}</p>}
             <div className="exercise-answer">
               <TextInput
@@ -138,7 +155,9 @@ export default function WorksheetView({ worksheet, exerciseIds = [] }: Props) {
           <h3>Roleplay prompts</h3>
           <ul className="prompt-list">
             {worksheet.roleplay_prompts.map((p, i) => (
-              <li key={i}>{p}</li>
+              <li key={i}>
+                <InteractiveText text={p} lang={lang} />
+              </li>
             ))}
           </ul>
         </section>

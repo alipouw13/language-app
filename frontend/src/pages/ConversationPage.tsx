@@ -3,6 +3,7 @@ import type { LangCode } from '../constants';
 import { LANGUAGES } from '../constants';
 import { useConversationStore } from '../state/useConversationStore';
 import { authHeader } from '../services/api';
+import InteractiveText from '../components/InteractiveText';
 import { Alert, Button, Card, Field, LanguageBadge, Select, TextInput } from '../components/ui';
 
 export default function ConversationPage() {
@@ -153,7 +154,7 @@ export default function ConversationPage() {
         <div className="chat-window">
           {turns.map((turn, i) => (
             <div key={i} className={`bubble ${turn.role}`}>
-              {turn.text}
+              <InteractiveText text={turn.text} lang={language} />
             </div>
           ))}
           {loading && <div className="bubble assistant typing">Typing…</div>}

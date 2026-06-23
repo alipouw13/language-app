@@ -21,6 +21,7 @@ import {
   LanguageBadge,
   Spinner,
 } from '../components/ui';
+import InteractiveText from '../components/InteractiveText';
 
 type Tab = 'worksheets' | 'conversations';
 
@@ -122,7 +123,12 @@ export default function LessonsPage() {
           {selectedLesson.worksheet && (
             <>
               <h3>Grammar: {selectedLesson.worksheet.grammar_focus}</h3>
-              <p className="prose">{selectedLesson.worksheet.explanations}</p>
+              <p className="prose">
+                <InteractiveText
+                  text={selectedLesson.worksheet.explanations}
+                  lang={selectedLesson.target_language}
+                />
+              </p>
 
               <h3>Vocabulary</h3>
               <table className="data-table">
@@ -137,11 +143,18 @@ export default function LessonsPage() {
                   {selectedLesson.worksheet.vocabulary.map((v, i) => (
                     <tr key={i}>
                       <td>
-                        <strong>{v.word}</strong>
+                        <strong>
+                          <InteractiveText text={v.word} lang={selectedLesson.target_language} />
+                        </strong>
                       </td>
                       <td>{v.translation}</td>
                       <td className="muted">
-                        <em>{v.example_sentence}</em>
+                        <em>
+                          <InteractiveText
+                            text={v.example_sentence}
+                            lang={selectedLesson.target_language}
+                          />
+                        </em>
                       </td>
                     </tr>
                   ))}
@@ -153,10 +166,12 @@ export default function LessonsPage() {
                 <div key={i} className="exercise">
                   <span className="type-badge">{ex.type.replace('_', ' ')}</span>
                   <p>
-                    <strong>Q:</strong> {ex.question}
+                    <strong>Q:</strong>{' '}
+                    <InteractiveText text={ex.question} lang={selectedLesson.target_language} />
                   </p>
                   <p>
-                    <strong>A:</strong> {ex.answer}
+                    <strong>A:</strong>{' '}
+                    <InteractiveText text={ex.answer} lang={selectedLesson.target_language} />
                   </p>
                 </div>
               ))}
@@ -181,7 +196,7 @@ export default function LessonsPage() {
           <div className="chat-window tall">
             {selectedConvo.turns.map((t, i) => (
               <div key={i} className={`bubble ${t.role}`}>
-                {t.text}
+                <InteractiveText text={t.text} lang={selectedConvo.target_language} />
                 {t.corrected_text && (
                   <p className="correction">Correction: {t.corrected_text}</p>
                 )}

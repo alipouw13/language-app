@@ -48,6 +48,53 @@ export async function generateVerbWorksheet(
   return data;
 }
 
+// --- Interactive words: hover-to-translate + click-to-speak (cached) ---
+
+const _wordTranslationCache = new Map<string, Promise<string>>();
+const _wordAudioCache = new Map<string, Promise<string>>();
+
+/** Translate a single word/phrase into the gloss language (default English). */
+export function translateWord(
+  word: string,
+  lang: string,
+  gloss = 'en',
+): Promise<string> {
+  const clean = word.trim();
+  if (!clean || lang === gloss) return Promise.resolve('');
+  const key = `${lang}->${gloss}:${clean.toLowerCase()}`;
+  let p = _wordTranslationCache.get(key);
+  if (!p) {
+    p = translateText(clean, [gloss], lang)
+      .then((r) => r.translations[gloss] || '')
+      .catch((e) => {
+        _wordTranslationCache.delete(key);
+        throw e;
+      });
+    _wordTranslationCache.set(key, p);
+  }
+  return p;
+}
+
+/** Speak a word/phrase aloud in the given language (cached audio). */
+export async function speakWord(word: string, lang: string): Promise<void> {
+  const clean = word.trim();
+  if (!clean) return;
+  const key = `${lang}:${clean.toLowerCase()}`;
+  let p = _wordAudioCache.get(key);
+  if (!p) {
+    p = api
+      .post('/speech/tts', { text: clean, language: lang }, { responseType: 'blob' })
+      .then((res) => URL.createObjectURL(res.data as Blob))
+      .catch((e) => {
+        _wordAudioCache.delete(key);
+        throw e;
+      });
+    _wordAudioCache.set(key, p);
+  }
+  const url = await p;
+  await new Audio(url).play();
+}
+
 export async function listVerbs(language: string): Promise<VerbOption[]> {
   const { data } = await api.get('/worksheets/verbs', { params: { language } });
   return data.verbs;

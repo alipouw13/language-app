@@ -1,44 +1,19 @@
 """
 Conversation service.
 
-Manages multi-turn conversation sessions backed by PostgreSQL.
-Each turn is stored, and the last N turns are sent to the LLM
-as context for the next reply.
+Manages multi-turn conversation sessions persisted as Delta tables in the
+Fabric OneLake Lakehouse. Each turn is stored; the last N turns are sent to
+the LLM as context for the next reply.
 """
 
 from __future__ import annotations
 
-import uuid
-
-from sqlalchemy import select, func
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
-from app.models.db_models import Conversation, ConversationTurn, User
 from app.models.pydantic_models import ConversationStartRequest
+from app.repository import store
 from app.services.llm_service import chat_completion
 
 LANGUAGE_NAMES = {"en": "English", "fr": "French", "es": "Spanish"}
-MEMORY_WINDOW = 10  # number of recent turns sent to LLM
-
-
-async def _get_or_create_user(db: AsyncSession, user_id: uuid.UUID | None) -> uuid.UUID:
-    """Get an existing user or create a new anonymous user."""
-    if user_id:
-        # Check if user exists
-        result = await db.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-        if user:
-            return user.id
-    
-    # Create a new anonymous user
-    new_user = User(
-        display_name="Anonymous Learner",
-        native_language="en",
-    )
-    db.add(new_user)
-    await db.flush()
-    return new_user.id
+MEMORY_WINDOW = 10  # number of recent turns sent to the LLM
 
 
 def _build_system_prompt(language: str, scenario: str | None) -> str:
@@ -56,89 +31,58 @@ def _build_system_prompt(language: str, scenario: str | None) -> str:
 
 
 async def start_conversation(
-    req: ConversationStartRequest,
-    db: AsyncSession,
-) -> Conversation:
-    """Create a new conversation session."""
-    user_id = await _get_or_create_user(db, req.user_id)
-    conv = Conversation(
+    req: ConversationStartRequest, user_id: str
+) -> dict:
+    return await store.create_conversation(
         user_id=user_id,
         target_language=req.target_language,
         scenario_context=req.scenario_context,
     )
-    db.add(conv)
-    await db.flush()
-    return conv
 
 
-async def get_conversation(
-    conversation_id: uuid.UUID,
-    db: AsyncSession,
-) -> Conversation:
-    result = await db.execute(
-        select(Conversation)
-        .options(selectinload(Conversation.turns))
-        .where(Conversation.id == conversation_id)
-    )
-    conv = result.scalar_one_or_none()
+async def get_conversation(conversation_id: str) -> dict:
+    conv = await store.get_conversation(conversation_id)
     if conv is None:
         raise ValueError(f"Conversation {conversation_id} not found")
     return conv
 
 
 async def add_user_turn_and_reply(
-    conversation_id: uuid.UUID,
-    user_text: str,
-    db: AsyncSession,
+    conversation_id: str, user_text: str
 ) -> tuple[str, str | None]:
-    """Append a user turn, get LLM reply, return (reply_text, correction_or_none).
+    """Append a user turn, get the LLM reply, append it, and return both.
 
-    The correction is the LLM's inline-corrected version of the user's text,
-    or None if no correction was needed.
+    Returns ``(reply_text, correction_or_none)``.
     """
-    conv = await get_conversation(conversation_id, db)
+    conv = await get_conversation(conversation_id)
+    existing_turns = conv["turns"]
+    next_index = len(existing_turns)
 
-    next_index = len(conv.turns)
-
-    # Store user turn
-    user_turn = ConversationTurn(
-        conversation_id=conv.id,
+    user_turn = await store.append_turn(
+        conversation_id=conversation_id,
         role="user",
         text=user_text,
         turn_index=next_index,
     )
-    db.add(user_turn)
-    await db.flush()
 
-    # Build LLM messages from recent history
     system_msg = {
         "role": "system",
-        "content": _build_system_prompt(conv.target_language, conv.scenario_context),
+        "content": _build_system_prompt(
+            conv["target_language"], conv.get("scenario_context")
+        ),
     }
-    history_msgs = []
-    recent_turns = conv.turns[-(MEMORY_WINDOW):]  # last N turns
-    for t in recent_turns:
-        history_msgs.append({"role": t.role, "content": t.text})
-    # Append current user message
-    history_msgs.append({"role": "user", "content": user_text})
-
-    messages = [system_msg] + history_msgs
+    recent = (existing_turns + [user_turn])[-MEMORY_WINDOW:]
+    history = [{"role": t["role"], "content": t["text"]} for t in recent]
+    messages = [system_msg] + history
 
     reply_text = await chat_completion(messages, temperature=0.7)
 
-    # Store assistant turn
-    assistant_turn = ConversationTurn(
-        conversation_id=conv.id,
+    await store.append_turn(
+        conversation_id=conversation_id,
         role="assistant",
         text=reply_text,
         turn_index=next_index + 1,
     )
-    db.add(assistant_turn)
-    await db.flush()
 
-    # Detect inline corrections (simple heuristic: parenthesized corrections)
-    correction = None
-    if "(" in reply_text and ")" in reply_text:
-        correction = reply_text  # full reply contains inline corrections
-
+    correction = reply_text if ("(" in reply_text and ")" in reply_text) else None
     return reply_text, correction

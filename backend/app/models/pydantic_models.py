@@ -1,35 +1,51 @@
 """
 Pydantic request/response schemas.
 
-Kept separate from ORM models so input validation logic
-doesn't leak into the persistence layer.
+Kept separate from the persistence layer so input validation logic doesn't
+leak into the data store. Caller identity comes from the Entra principal
+(see app.auth.entra), so requests no longer carry a ``user_id``.
 """
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
-from typing import Any
 
 from pydantic import BaseModel, Field
 
+LANG_PATTERN = r"^(en|fr|es)$"
+LEVEL_PATTERN = r"^(A1|A2|B1|B2|C1|C2)$"
 
-# ---------------------------------------------------------------------------
-# Worksheet generation
-# ---------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------- #
+# Worksheet generation                                                         #
+# --------------------------------------------------------------------------- #
 class WorksheetRequest(BaseModel):
     scenario: str = Field(..., min_length=3, max_length=500)
-    target_language: str = Field(..., pattern=r"^(en|fr|es)$")
+    target_language: str = Field(..., pattern=LANG_PATTERN)
     grammar_focus: str | None = None
-    difficulty: str = Field("A1", pattern=r"^(A1|A2|B1|B2|C1|C2)$")
-    user_id: uuid.UUID | None = None
+    difficulty: str = Field("A1", pattern=LEVEL_PATTERN)
+
+
+class VerbWorksheetRequest(BaseModel):
+    """Request a worksheet focused on a single verb."""
+
+    verb: str = Field(..., min_length=1, max_length=80)
+    target_language: str = Field(..., pattern=LANG_PATTERN)
+    native_language: str = Field("en", pattern=LANG_PATTERN)
+    grammar_focus: str | None = None  # specific tense (optional)
+    difficulty: str = Field("A2", pattern=LEVEL_PATTERN)
 
 
 class VocabularyItem(BaseModel):
     word: str
     translation: str
     example_sentence: str
+
+
+class ConjugationRow(BaseModel):
+    pronoun: str
+    form: str
+    translation: str = ""
 
 
 class ExerciseItem(BaseModel):
@@ -46,25 +62,16 @@ class WorksheetResponse(BaseModel):
     explanations: str
     exercises: list[ExerciseItem]
     roleplay_prompts: list[str]
+    # Verb-practice extras (optional; populated in verb mode).
+    verb: str | None = None
+    conjugation_table: list[ConjugationRow] = Field(default_factory=list)
 
 
-class LessonOut(BaseModel):
-    id: uuid.UUID
-    target_language: str
-    scenario: str
-    grammar_focus: str | None
-    difficulty: str
-    worksheet: WorksheetResponse
-    version: int
-    created_at: datetime
-
-
-# ---------------------------------------------------------------------------
-# Exercise evaluation
-# ---------------------------------------------------------------------------
-
+# --------------------------------------------------------------------------- #
+# Exercise evaluation                                                          #
+# --------------------------------------------------------------------------- #
 class ExerciseSubmission(BaseModel):
-    exercise_id: uuid.UUID
+    exercise_id: str
     user_answer: str
 
 
@@ -75,13 +82,26 @@ class ExerciseEvaluation(BaseModel):
     correct_answer: str
 
 
-# ---------------------------------------------------------------------------
-# Conversation
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------------------------- #
+# Translation (Foundry translation model)                                      #
+# --------------------------------------------------------------------------- #
+class TranslationRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=2000)
+    source_language: str = Field("auto", pattern=r"^(auto|en|fr|es)$")
+    target_languages: list[str] = Field(..., min_length=1)
 
+
+class TranslationResponse(BaseModel):
+    source_language: str
+    translations: dict[str, str]
+    model: str
+
+
+# --------------------------------------------------------------------------- #
+# Conversation                                                                 #
+# --------------------------------------------------------------------------- #
 class ConversationStartRequest(BaseModel):
-    user_id: uuid.UUID | None = None
-    target_language: str = Field(..., pattern=r"^(en|fr|es)$")
+    target_language: str = Field(..., pattern=LANG_PATTERN)
     scenario_context: str | None = None
 
 
@@ -96,24 +116,25 @@ class ConversationTurnOut(BaseModel):
     turn_index: int
 
 
-class ConversationOut(BaseModel):
-    id: uuid.UUID
-    target_language: str
-    scenario_context: str | None
-    turns: list[ConversationTurnOut]
-    created_at: datetime
-
-
-# ---------------------------------------------------------------------------
-# Lessons library
-# ---------------------------------------------------------------------------
-
+# --------------------------------------------------------------------------- #
+# Lessons library                                                              #
+# --------------------------------------------------------------------------- #
 class LessonSummary(BaseModel):
-    id: uuid.UUID
+    id: str
     scenario: str
     target_language: str
     difficulty: str
+    mode: str = "scenario"
+    verb: str | None = None
     exercise_count: int
+    created_at: datetime
+
+
+class ConversationSummary(BaseModel):
+    id: str
+    target_language: str
+    scenario_context: str | None
+    turn_count: int
     created_at: datetime
 
 
@@ -124,36 +145,8 @@ class PaginatedLessons(BaseModel):
     page_size: int
 
 
-class ConversationSummary(BaseModel):
-    id: uuid.UUID
-    target_language: str
-    scenario_context: str | None
-    turn_count: int
-    created_at: datetime
-
-
 class PaginatedConversations(BaseModel):
     items: list[ConversationSummary]
     total: int
     page: int
     page_size: int
-
-
-# ---------------------------------------------------------------------------
-# Simple translation (kept for backward compat)
-# ---------------------------------------------------------------------------
-
-class TranslateRequest(BaseModel):
-    text: str
-    from_lang: str
-    to_langs: list[str]
-
-
-class GrammarRequest(BaseModel):
-    sentence: str
-    language: str
-
-
-class ChatRequest(BaseModel):
-    history: list[dict[str, str]]
-    language: str

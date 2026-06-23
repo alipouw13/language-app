@@ -4,6 +4,12 @@ export interface VocabularyItem {
   example_sentence: string;
 }
 
+export interface ConjugationRow {
+  pronoun: string;
+  form: string;
+  translation: string;
+}
+
 export interface ExerciseItem {
   type: 'fill_blank' | 'conjugation' | 'sentence_building' | 'translation';
   question: string;
@@ -18,6 +24,8 @@ export interface Worksheet {
   explanations: string;
   exercises: ExerciseItem[];
   roleplay_prompts: string[];
+  verb?: string | null;
+  conjugation_table?: ConjugationRow[];
 }
 
 export interface WorksheetRequest {
@@ -25,7 +33,14 @@ export interface WorksheetRequest {
   target_language: 'en' | 'fr' | 'es';
   grammar_focus?: string;
   difficulty: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
-  user_id?: string;
+}
+
+export interface VerbWorksheetRequest {
+  verb: string;
+  target_language: 'en' | 'fr' | 'es';
+  native_language: 'en' | 'fr' | 'es';
+  grammar_focus?: string;
+  difficulty: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 }
 
 export interface LessonResponse {
@@ -46,6 +61,8 @@ export interface LessonDetail {
   id: string;
   target_language: string;
   scenario: string;
+  mode?: string;
+  verb?: string | null;
   grammar_focus: string | null;
   difficulty: string;
   worksheet: Worksheet;
@@ -59,6 +76,17 @@ export interface ExerciseEvaluation {
   score: number;
   feedback: string;
   correct_answer: string;
+}
+
+export interface VerbOption {
+  verb: string;
+  gloss: string;
+}
+
+export interface TranslationResult {
+  source_language: string;
+  translations: Record<string, string>;
+  model: string;
 }
 
 export interface ConversationTurn {
@@ -81,6 +109,8 @@ export interface LessonSummary {
   scenario: string;
   target_language: string;
   difficulty: string;
+  mode?: string;
+  verb?: string | null;
   exercise_count: number;
   created_at: string;
 }

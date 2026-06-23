@@ -12,65 +12,49 @@ import {
   listConversations,
   listLessons,
 } from '../services/api';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  LanguageBadge,
+  Spinner,
+} from '../components/ui';
 
 type Tab = 'worksheets' | 'conversations';
 
 export default function LessonsPage() {
   const [tab, setTab] = useState<Tab>('worksheets');
-
-  // Worksheets
   const [lessons, setLessons] = useState<PaginatedResponse<LessonSummary> | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<LessonDetail | null>(null);
   const [lPage, setLPage] = useState(1);
-
-  // Conversations
   const [convos, setConvos] = useState<PaginatedResponse<ConversationSummary> | null>(null);
   const [selectedConvo, setSelectedConvo] = useState<ConversationDetail | null>(null);
   const [cPage, setCPage] = useState(1);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (tab === 'worksheets') {
-      loadLessons();
-    } else {
-      loadConversations();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let active = true;
+    setLoading(true);
+    setError(null);
+    const load =
+      tab === 'worksheets'
+        ? listLessons(lPage).then((d) => active && setLessons(d))
+        : listConversations(cPage).then((d) => active && setConvos(d));
+    load
+      .catch(() => active && setError('Failed to load history'))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, [tab, lPage, cPage]);
-
-  const loadLessons = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await listLessons(lPage);
-      setLessons(data);
-    } catch {
-      setError('Failed to load lessons');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadConversations = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await listConversations(cPage);
-      setConvos(data);
-    } catch {
-      setError('Failed to load conversations');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openLesson = async (id: string) => {
     setLoading(true);
     try {
-      const data = await getLesson(id);
-      setSelectedLesson(data);
+      setSelectedLesson(await getLesson(id));
     } catch {
       setError('Failed to load lesson');
     } finally {
@@ -81,8 +65,7 @@ export default function LessonsPage() {
   const openConversation = async (id: string) => {
     setLoading(true);
     try {
-      const data = await getConversation(id);
-      setSelectedConvo(data);
+      setSelectedConvo(await getConversation(id));
     } catch {
       setError('Failed to load conversation');
     } finally {
@@ -90,162 +73,197 @@ export default function LessonsPage() {
     }
   };
 
-  const langBadge = (lang: string) => `badge badge-${lang}`;
+  const switchTab = (t: Tab) => {
+    setTab(t);
+    setSelectedLesson(null);
+    setSelectedConvo(null);
+  };
 
   return (
-    <div>
-      <h2>Past Lessons Library</h2>
+    <div className="page">
+      <header className="page-head">
+        <h1>History</h1>
+        <p className="muted">Your saved worksheets and conversations, stored in OneLake.</p>
+      </header>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+      <div className="segmented" role="tablist">
         <button
-          onClick={() => { setTab('worksheets'); setSelectedLesson(null); setSelectedConvo(null); }}
-          style={{ background: tab === 'worksheets' ? '#4361ee' : '#aaa' }}
+          role="tab"
+          aria-selected={tab === 'worksheets'}
+          className={tab === 'worksheets' ? 'seg active' : 'seg'}
+          onClick={() => switchTab('worksheets')}
         >
           Worksheets
         </button>
         <button
-          onClick={() => { setTab('conversations'); setSelectedLesson(null); setSelectedConvo(null); }}
-          style={{ background: tab === 'conversations' ? '#4361ee' : '#aaa' }}
+          role="tab"
+          aria-selected={tab === 'conversations'}
+          className={tab === 'conversations' ? 'seg active' : 'seg'}
+          onClick={() => switchTab('conversations')}
         >
           Conversations
         </button>
       </div>
 
-      {error && <p className="error">{error}</p>}
-      {loading && <p className="loading">Loading…</p>}
+      {error && <Alert>{error}</Alert>}
+      {loading && <Spinner label="Loading…" />}
 
-      {/* Worksheet detail view */}
       {selectedLesson && (
-        <div className="card">
-          <button onClick={() => setSelectedLesson(null)} style={{ marginBottom: '1rem', background: '#6c757d' }}>
+        <Card>
+          <Button variant="ghost" onClick={() => setSelectedLesson(null)}>
             ← Back
-          </button>
-          <h3>{selectedLesson.scenario}</h3>
+          </Button>
+          <h2>{selectedLesson.scenario}</h2>
           <p>
-            <span className={langBadge(selectedLesson.target_language)}>
-              {selectedLesson.target_language.toUpperCase()}
-            </span>{' '}
-            Level: {selectedLesson.difficulty}
+            <LanguageBadge code={selectedLesson.target_language} />{' '}
+            <Badge>{selectedLesson.difficulty}</Badge>{' '}
+            {selectedLesson.verb && <Badge>verb · {selectedLesson.verb}</Badge>}
           </p>
-
           {selectedLesson.worksheet && (
             <>
-              <h4>Grammar: {selectedLesson.worksheet.grammar_focus}</h4>
-              <p>{selectedLesson.worksheet.explanations}</p>
+              <h3>Grammar: {selectedLesson.worksheet.grammar_focus}</h3>
+              <p className="prose">{selectedLesson.worksheet.explanations}</p>
 
-              <h4>Vocabulary</h4>
-              <table className="vocab-table">
+              <h3>Vocabulary</h3>
+              <table className="data-table">
                 <thead>
-                  <tr><th>Word</th><th>Translation</th><th>Example</th></tr>
+                  <tr>
+                    <th>Word</th>
+                    <th>Translation</th>
+                    <th>Example</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {selectedLesson.worksheet.vocabulary.map((v, i) => (
                     <tr key={i}>
-                      <td><strong>{v.word}</strong></td>
+                      <td>
+                        <strong>{v.word}</strong>
+                      </td>
                       <td>{v.translation}</td>
-                      <td><em>{v.example_sentence}</em></td>
+                      <td className="muted">
+                        <em>{v.example_sentence}</em>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
-              <h4>Exercises</h4>
+              <h3>Exercises</h3>
               {selectedLesson.worksheet.exercises.map((ex, i) => (
-                <div key={i} className="exercise-card">
+                <div key={i} className="exercise">
                   <span className="type-badge">{ex.type.replace('_', ' ')}</span>
-                  <p><strong>Q:</strong> {ex.question}</p>
-                  <p><strong>A:</strong> {ex.answer}</p>
+                  <p>
+                    <strong>Q:</strong> {ex.question}
+                  </p>
+                  <p>
+                    <strong>A:</strong> {ex.answer}
+                  </p>
                 </div>
               ))}
             </>
           )}
-        </div>
+        </Card>
       )}
 
-      {/* Conversation detail view */}
       {selectedConvo && (
-        <div className="card">
-          <button onClick={() => setSelectedConvo(null)} style={{ marginBottom: '1rem', background: '#6c757d' }}>
+        <Card>
+          <Button variant="ghost" onClick={() => setSelectedConvo(null)}>
             ← Back
-          </button>
-          <h3>
-            Conversation{' '}
-            <span className={langBadge(selectedConvo.target_language)}>
-              {selectedConvo.target_language.toUpperCase()}
-            </span>
-          </h3>
+          </Button>
+          <h2>
+            Conversation <LanguageBadge code={selectedConvo.target_language} />
+          </h2>
           {selectedConvo.scenario_context && (
-            <p><em>Scenario: {selectedConvo.scenario_context}</em></p>
+            <p className="muted">
+              <em>Scenario: {selectedConvo.scenario_context}</em>
+            </p>
           )}
-          <div className="chat-window" style={{ height: '400px' }}>
+          <div className="chat-window tall">
             {selectedConvo.turns.map((t, i) => (
-              <div key={i} className={`chat-bubble ${t.role}`}>
+              <div key={i} className={`bubble ${t.role}`}>
                 {t.text}
                 {t.corrected_text && (
-                  <p style={{ fontSize: '0.8rem', marginTop: '0.25rem', opacity: 0.8 }}>
-                    Correction: {t.corrected_text}
-                  </p>
+                  <p className="correction">Correction: {t.corrected_text}</p>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      {/* List views */}
       {!selectedLesson && !selectedConvo && tab === 'worksheets' && lessons && (
-        <div className="card">
+        <Card>
           {lessons.items.length === 0 ? (
-            <p>No worksheets yet. Generate one from the Worksheets page!</p>
+            <EmptyState>No worksheets yet — generate one to get started.</EmptyState>
           ) : (
             lessons.items.map((l) => (
-              <div key={l.id} className="lesson-list-item" onClick={() => openLesson(l.id)}>
+              <div key={l.id} className="list-item" onClick={() => openLesson(l.id)}>
                 <div>
                   <strong>{l.scenario}</strong>
                   <br />
-                  <small>{new Date(l.created_at).toLocaleDateString()} · {l.exercise_count} exercises</small>
+                  <small className="muted">
+                    {new Date(l.created_at).toLocaleDateString()} · {l.exercise_count} exercises
+                  </small>
                 </div>
-                <div>
-                  <span className={langBadge(l.target_language)}>{l.target_language.toUpperCase()}</span>{' '}
-                  <span className="badge">{l.difficulty}</span>
+                <div className="list-meta">
+                  <LanguageBadge code={l.target_language} />
+                  <Badge>{l.difficulty}</Badge>
                 </div>
               </div>
             ))
           )}
           {lessons.total > lessons.page_size && (
             <div className="pagination">
-              <button disabled={lPage <= 1} onClick={() => setLPage((p) => p - 1)}>Prev</button>
+              <Button variant="secondary" disabled={lPage <= 1} onClick={() => setLPage((p) => p - 1)}>
+                Prev
+              </Button>
               <span>Page {lPage}</span>
-              <button disabled={lPage * lessons.page_size >= lessons.total} onClick={() => setLPage((p) => p + 1)}>Next</button>
+              <Button
+                variant="secondary"
+                disabled={lPage * lessons.page_size >= lessons.total}
+                onClick={() => setLPage((p) => p + 1)}
+              >
+                Next
+              </Button>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {!selectedLesson && !selectedConvo && tab === 'conversations' && convos && (
-        <div className="card">
+        <Card>
           {convos.items.length === 0 ? (
-            <p>No conversations yet. Start one from the Conversation page!</p>
+            <EmptyState>No conversations yet — start one to see it here.</EmptyState>
           ) : (
             convos.items.map((c) => (
-              <div key={c.id} className="lesson-list-item" onClick={() => openConversation(c.id)}>
+              <div key={c.id} className="list-item" onClick={() => openConversation(c.id)}>
                 <div>
                   <strong>{c.scenario_context || 'Free conversation'}</strong>
                   <br />
-                  <small>{new Date(c.created_at).toLocaleDateString()} · {c.turn_count} turns</small>
+                  <small className="muted">
+                    {new Date(c.created_at).toLocaleDateString()} · {c.turn_count} turns
+                  </small>
                 </div>
-                <span className={langBadge(c.target_language)}>{c.target_language.toUpperCase()}</span>
+                <LanguageBadge code={c.target_language} />
               </div>
             ))
           )}
           {convos.total > convos.page_size && (
             <div className="pagination">
-              <button disabled={cPage <= 1} onClick={() => setCPage((p) => p - 1)}>Prev</button>
+              <Button variant="secondary" disabled={cPage <= 1} onClick={() => setCPage((p) => p - 1)}>
+                Prev
+              </Button>
               <span>Page {cPage}</span>
-              <button disabled={cPage * convos.page_size >= convos.total} onClick={() => setCPage((p) => p + 1)}>Next</button>
+              <Button
+                variant="secondary"
+                disabled={cPage * convos.page_size >= convos.total}
+                onClick={() => setCPage((p) => p + 1)}
+              >
+                Next
+              </Button>
             </div>
           )}
-        </div>
+        </Card>
       )}
     </div>
   );

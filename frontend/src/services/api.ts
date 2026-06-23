@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { acquireToken } from '../auth/msal';
 import type {
   ConversationDetail,
   ConversationSummary,
@@ -7,6 +8,9 @@ import type {
   LessonResponse,
   LessonSummary,
   PaginatedResponse,
+  TranslationResult,
+  VerbOption,
+  VerbWorksheetRequest,
   WorksheetRequest,
 } from '../types';
 
@@ -15,11 +19,38 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Attach the Entra bearer token to every request (no-op when auth disabled).
+api.interceptors.request.use(async (config) => {
+  const token = await acquireToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+/** Authorization header for raw fetch() calls (e.g. multipart upload). */
+export async function authHeader(): Promise<Record<string, string>> {
+  const token = await acquireToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // --- Worksheets ---
 
 export async function generateWorksheet(req: WorksheetRequest): Promise<LessonResponse> {
   const { data } = await api.post('/worksheets', req);
   return data;
+}
+
+export async function generateVerbWorksheet(
+  req: VerbWorksheetRequest,
+): Promise<LessonResponse> {
+  const { data } = await api.post('/worksheets/verb', req);
+  return data;
+}
+
+export async function listVerbs(language: string): Promise<VerbOption[]> {
+  const { data } = await api.get('/worksheets/verbs', { params: { language } });
+  return data.verbs;
 }
 
 export async function getLesson(lessonId: string): Promise<LessonDetail> {
@@ -34,6 +65,21 @@ export async function evaluateExercise(
   const { data } = await api.post('/worksheets/evaluate', {
     exercise_id: exerciseId,
     user_answer: userAnswer,
+  });
+  return data;
+}
+
+// --- Translation (Foundry translation model) ---
+
+export async function translateText(
+  text: string,
+  targetLanguages: string[],
+  sourceLanguage = 'auto',
+): Promise<TranslationResult> {
+  const { data } = await api.post('/translate', {
+    text,
+    source_language: sourceLanguage,
+    target_languages: targetLanguages,
   });
   return data;
 }

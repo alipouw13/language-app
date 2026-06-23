@@ -5,12 +5,16 @@ import type {
   LessonDetail,
   LessonSummary,
   PaginatedResponse,
+  SubmissionDetail,
+  SubmissionSummary,
 } from '../types';
 import {
   getConversation,
   getLesson,
+  getSubmission,
   listConversations,
   listLessons,
+  listSubmissions,
 } from '../services/api';
 import {
   Alert,
@@ -23,7 +27,9 @@ import {
 } from '../components/ui';
 import InteractiveText from '../components/InteractiveText';
 
-type Tab = 'worksheets' | 'conversations';
+type Tab = 'worksheets' | 'conversations' | 'progress';
+
+const pct = (n: number) => `${Math.round((n ?? 0) * 100)}%`;
 
 export default function LessonsPage() {
   const [tab, setTab] = useState<Tab>('worksheets');
@@ -33,6 +39,9 @@ export default function LessonsPage() {
   const [convos, setConvos] = useState<PaginatedResponse<ConversationSummary> | null>(null);
   const [selectedConvo, setSelectedConvo] = useState<ConversationDetail | null>(null);
   const [cPage, setCPage] = useState(1);
+  const [subs, setSubs] = useState<PaginatedResponse<SubmissionSummary> | null>(null);
+  const [selectedSub, setSelectedSub] = useState<SubmissionDetail | null>(null);
+  const [sPage, setSPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,17 +49,21 @@ export default function LessonsPage() {
     let active = true;
     setLoading(true);
     setError(null);
-    const load =
-      tab === 'worksheets'
-        ? listLessons(lPage).then((d) => active && setLessons(d))
-        : listConversations(cPage).then((d) => active && setConvos(d));
+    let load: Promise<unknown>;
+    if (tab === 'worksheets') {
+      load = listLessons(lPage).then((d) => active && setLessons(d));
+    } else if (tab === 'conversations') {
+      load = listConversations(cPage).then((d) => active && setConvos(d));
+    } else {
+      load = listSubmissions(sPage).then((d) => active && setSubs(d));
+    }
     load
       .catch(() => active && setError('Failed to load history'))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
-  }, [tab, lPage, cPage]);
+  }, [tab, lPage, cPage, sPage]);
 
   const openLesson = async (id: string) => {
     setLoading(true);
@@ -74,17 +87,31 @@ export default function LessonsPage() {
     }
   };
 
+  const openSubmission = async (id: string) => {
+    setLoading(true);
+    try {
+      setSelectedSub(await getSubmission(id));
+    } catch {
+      setError('Failed to load submission');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const switchTab = (t: Tab) => {
     setTab(t);
     setSelectedLesson(null);
     setSelectedConvo(null);
+    setSelectedSub(null);
   };
 
   return (
     <div className="page">
       <header className="page-head">
         <h1>History</h1>
-        <p className="muted">Your saved worksheets and conversations, stored in OneLake.</p>
+        <p className="muted">
+          Your saved worksheets, conversations and submitted progress — stored in OneLake.
+        </p>
       </header>
 
       <div className="segmented" role="tablist">
@@ -103,6 +130,14 @@ export default function LessonsPage() {
           onClick={() => switchTab('conversations')}
         >
           Conversations
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'progress'}
+          className={tab === 'progress' ? 'seg active' : 'seg'}
+          onClick={() => switchTab('progress')}
+        >
+          Progress
         </button>
       </div>
 
@@ -206,7 +241,79 @@ export default function LessonsPage() {
         </Card>
       )}
 
-      {!selectedLesson && !selectedConvo && tab === 'worksheets' && lessons && (
+      {selectedSub && (
+        <Card>
+          <Button variant="ghost" onClick={() => setSelectedSub(null)}>
+            ← Back
+          </Button>
+          <h2>
+            {selectedSub.mode === 'verb' && selectedSub.verb
+              ? `Verb practice · ${selectedSub.verb}`
+              : selectedSub.scenario || 'Worksheet'}{' '}
+            <LanguageBadge code={selectedSub.target_language} />
+          </h2>
+          <p className="muted">
+            Submitted {new Date(selectedSub.submitted_at).toLocaleString()} ·{' '}
+            {selectedSub.answered_count}/{selectedSub.total_exercises} answered
+          </p>
+
+          <div className="score-cards">
+            <div className="score-card">
+              <span className="score-label">First score</span>
+              <span className="score-value">{pct(selectedSub.first_score_avg)}</span>
+            </div>
+            <div className="score-card">
+              <span className="score-label">Corrected score</span>
+              <span className="score-value good">{pct(selectedSub.final_score_avg)}</span>
+            </div>
+            <div className="score-card">
+              <span className="score-label">Improvement</span>
+              <span className="score-value">
+                +{pct(selectedSub.final_score_avg - selectedSub.first_score_avg)}
+              </span>
+            </div>
+          </div>
+
+          <h3>Responses</h3>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Your answer</th>
+                <th>Correct</th>
+                <th>First</th>
+                <th>Final</th>
+                <th>Tries</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedSub.responses.map((r) => (
+                <tr key={r.response_id}>
+                  <td>{r.order_index + 1}</td>
+                  <td>
+                    <InteractiveText text={r.question} lang={selectedSub.target_language} />
+                  </td>
+                  <td>{r.user_answer || <span className="muted">—</span>}</td>
+                  <td>
+                    <InteractiveText
+                      text={r.correct_answer}
+                      lang={selectedSub.target_language}
+                    />
+                  </td>
+                  <td>{r.first_score === null ? '—' : pct(r.first_score)}</td>
+                  <td className={r.final_is_correct ? 'cell-good' : undefined}>
+                    {r.final_score === null ? '—' : pct(r.final_score)}
+                  </td>
+                  <td>{r.attempts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+
+      {!selectedLesson && !selectedConvo && !selectedSub && tab === 'worksheets' && lessons && (
         <Card>
           {lessons.items.length === 0 ? (
             <EmptyState>No worksheets yet — generate one to get started.</EmptyState>
@@ -245,7 +352,7 @@ export default function LessonsPage() {
         </Card>
       )}
 
-      {!selectedLesson && !selectedConvo && tab === 'conversations' && convos && (
+      {!selectedLesson && !selectedConvo && !selectedSub && tab === 'conversations' && convos && (
         <Card>
           {convos.items.length === 0 ? (
             <EmptyState>No conversations yet — start one to see it here.</EmptyState>
@@ -273,6 +380,57 @@ export default function LessonsPage() {
                 variant="secondary"
                 disabled={cPage * convos.page_size >= convos.total}
                 onClick={() => setCPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {!selectedSub && tab === 'progress' && subs && (
+        <Card>
+          {subs.items.length === 0 ? (
+            <EmptyState>
+              No submissions yet — finish a worksheet and click <strong>Submit worksheet</strong>.
+            </EmptyState>
+          ) : (
+            subs.items.map((s) => (
+              <div
+                key={s.submission_id}
+                className="list-item"
+                onClick={() => openSubmission(s.submission_id)}
+              >
+                <div>
+                  <strong>
+                    {s.mode === 'verb' && s.verb
+                      ? `Verb · ${s.verb}`
+                      : s.scenario || 'Worksheet'}
+                  </strong>
+                  <br />
+                  <small className="muted">
+                    {new Date(s.submitted_at).toLocaleDateString()} ·{' '}
+                    {s.answered_count}/{s.total_exercises} answered · first {pct(s.first_score_avg)} →{' '}
+                    corrected {pct(s.final_score_avg)}
+                  </small>
+                </div>
+                <div className="list-meta">
+                  <LanguageBadge code={s.target_language} />
+                  <Badge>{s.difficulty}</Badge>
+                </div>
+              </div>
+            ))
+          )}
+          {subs.total > subs.page_size && (
+            <div className="pagination">
+              <Button variant="secondary" disabled={sPage <= 1} onClick={() => setSPage((p) => p - 1)}>
+                Prev
+              </Button>
+              <span>Page {sPage}</span>
+              <Button
+                variant="secondary"
+                disabled={sPage * subs.page_size >= subs.total}
+                onClick={() => setSPage((p) => p + 1)}
               >
                 Next
               </Button>

@@ -630,3 +630,18 @@ async def list_submissions(
     total = len(subs)
     start = (page - 1) * page_size
     return subs[start : start + page_size], total
+
+
+async def get_submission(submission_id: str) -> dict[str, Any] | None:
+    """Return a submission header with its per-exercise response rows."""
+    lake = get_lakehouse()
+    subs = await lake.read_all(WORKSHEET_SUBMISSIONS, _schema(WORKSHEET_SUBMISSIONS))
+    header = next((s for s in subs if s["submission_id"] == submission_id), None)
+    if header is None:
+        return None
+    header = dict(header)
+    responses = await lake.read_all(WORKSHEET_RESPONSES, _schema(WORKSHEET_RESPONSES))
+    rows = [r for r in responses if r["submission_id"] == submission_id]
+    rows.sort(key=lambda r: r["order_index"])
+    header["responses"] = rows
+    return header

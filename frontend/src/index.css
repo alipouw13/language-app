@@ -480,6 +480,38 @@ textarea.control {
 .submit-meta {
   font-size: 0.88rem;
 }
+.score-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+.score-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.score-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.score-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.score-value.good {
+  color: var(--success);
+}
+.cell-good {
+  color: var(--success);
+  font-weight: 600;
+}
 
 /* ------------------------------------------------------------------ Chat */
 .chat-card {
@@ -628,6 +660,19 @@ textarea.control {
 .translation-item p {
   margin-top: 0.4rem;
 }
+.translation-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.speak-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
 
 /* ------------------------------------------------------------------ Sign in */
 .signin {
@@ -691,6 +736,75 @@ textarea.control {
   transform: translateX(-50%);
   border: 5px solid transparent;
   border-top-color: var(--text);
+}
+
+.speak-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s, border-color 0.12s, transform 0.05s;
+}
+.speak-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-50);
+}
+.speak-btn:active {
+  transform: translateY(1px);
+}
+.speak-btn.speaking {
+  color: var(--success);
+  border-color: var(--success);
+}
+.bubble .speak-btn {
+  background: transparent;
+  border-color: transparent;
+  width: 24px;
+  height: 24px;
+  font-size: 0.85rem;
+}
+.bubble.user .speak-btn {
+  color: #fff;
+}
+.bubble-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.bubble-row.assistant {
+  justify-content: flex-start;
+}
+.bubble-row.user {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.autospeak-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.autospeak-toggle input {
+  accent-color: var(--primary);
 }
 
 /* ------------------------------------------------------------------ Responsive */

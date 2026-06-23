@@ -8,6 +8,8 @@ import type {
   LessonResponse,
   LessonSummary,
   PaginatedResponse,
+  SubmissionDetail,
+  SubmissionSummary,
   TranslationResult,
   VerbOption,
   VerbWorksheetRequest,
@@ -96,6 +98,9 @@ export async function speakWord(word: string, lang: string): Promise<void> {
   const url = await p;
   await new Audio(url).play();
 }
+
+/** Speak a whole sentence/phrase aloud (alias of speakWord; backend caps length). */
+export const speakText = speakWord;
 
 export async function listVerbs(language: string): Promise<VerbOption[]> {
   const { data } = await api.get('/worksheets/verbs', { params: { language } });
@@ -187,5 +192,20 @@ export async function listConversations(
   const { data } = await api.get('/lessons/conversations', {
     params: { page, page_size: pageSize },
   });
+  return data;
+}
+
+export async function listSubmissions(
+  page = 1,
+  pageSize = 20,
+): Promise<PaginatedResponse<SubmissionSummary>> {
+  const { data } = await api.get('/lessons/submissions', {
+    params: { page, page_size: pageSize },
+  });
+  return data;
+}
+
+export async function getSubmission(submissionId: string): Promise<SubmissionDetail> {
+  const { data } = await api.get(`/lessons/submissions/${submissionId}`);
   return data;
 }

@@ -4,12 +4,16 @@ import { LANGUAGES } from '../constants';
 import type { TranslationResult } from '../types';
 import { translateText } from '../services/api';
 import InteractiveText from '../components/InteractiveText';
+import SpeakButton from '../components/SpeakButton';
 import { Alert, Button, Card, Field, LanguageBadge, Select, Spinner, TextArea } from '../components/ui';
 
 const SOURCES: { code: 'auto' | LangCode; label: string }[] = [
   { code: 'auto', label: 'Auto-detect' },
   ...LANGUAGES.map((l) => ({ code: l.code, label: l.label })),
 ];
+
+const LABELS: Record<string, string> = { en: 'English', fr: 'French', es: 'Spanish' };
+const labelFor = (code: string) => LABELS[code] ?? code.toUpperCase();
 
 export default function TranslatePage() {
   const [text, setText] = useState('');
@@ -18,6 +22,11 @@ export default function TranslatePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TranslationResult | null>(null);
+
+  // Language to use when speaking the source text: explicit choice, or the
+  // detected source after a translation. Hidden while it's unknown (auto).
+  const sourceSpeakLang: string | null =
+    source !== 'auto' ? source : result?.source_language ?? null;
 
   const toggleTarget = (code: LangCode) =>
     setTargets((prev) =>
@@ -57,6 +66,12 @@ export default function TranslatePage() {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+          {text.trim() && sourceSpeakLang && (
+            <div className="speak-inline">
+              <SpeakButton text={text} lang={sourceSpeakLang} title="Hear this sentence" />
+              <span className="muted">Hear it in {labelFor(sourceSpeakLang)}</span>
+            </div>
+          )}
         </Field>
 
         <div className="grid-2">
@@ -107,7 +122,10 @@ export default function TranslatePage() {
           <div className="translation-grid">
             {Object.entries(result.translations).map(([code, value]) => (
               <div key={code} className="translation-item">
-                <LanguageBadge code={code} />
+                <div className="translation-item-head">
+                  <LanguageBadge code={code} />
+                  <SpeakButton text={value} lang={code} title="Hear this translation" />
+                </div>
                 <p>
                   <InteractiveText text={value} lang={code} />
                 </p>

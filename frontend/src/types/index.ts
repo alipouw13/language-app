@@ -104,6 +104,45 @@ export interface WorksheetSubmissionResult {
   submitted_at: string;
 }
 
+export interface SubmissionSummary {
+  submission_id: string;
+  lesson_id: string;
+  target_language: string;
+  mode: string;
+  verb: string | null;
+  scenario: string | null;
+  difficulty: string;
+  grammar_focus: string | null;
+  total_exercises: number;
+  answered_count: number;
+  first_correct_count: number;
+  final_correct_count: number;
+  first_score_avg: number;
+  final_score_avg: number;
+  submitted_at: string;
+  date_key: number;
+}
+
+export interface SubmissionResponseRow {
+  response_id: string;
+  exercise_id: string;
+  order_index: number;
+  exercise_type: string;
+  question: string;
+  correct_answer: string;
+  user_answer: string;
+  first_score: number | null;
+  first_is_correct: boolean | null;
+  final_score: number | null;
+  final_is_correct: boolean | null;
+  attempts: number;
+  feedback: string | null;
+}
+
+export interface SubmissionDetail extends SubmissionSummary {
+  responses: SubmissionResponseRow[];
+}
+
 export interface VerbOption {
   verb: string;
   gloss: string;

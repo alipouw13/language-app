@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { LangCode } from '../constants';
 import { LANGUAGES } from '../constants';
 import { useConversationStore } from '../state/useConversationStore';
-import { authHeader } from '../services/api';
+import { authHeader, speakText } from '../services/api';
 import InteractiveText from '../components/InteractiveText';
+import SpeakButton from '../components/SpeakButton';
 import { Alert, Button, Card, Field, LanguageBadge, Select, TextInput } from '../components/ui';
 
 export default function ConversationPage() {
@@ -13,7 +14,9 @@ export default function ConversationPage() {
   const [language, setLanguage] = useState<LangCode>('fr');
   const [scenario, setScenario] = useState('');
   const [input, setInput] = useState('');
+  const [autoSpeak, setAutoSpeak] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const lastSpokenRef = useRef(-1);
 
   const [isRecording, setIsRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -23,6 +26,22 @@ export default function ConversationPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [turns]);
+
+  // Auto-speak the assistant's latest reply so the learner hears pronunciation.
+  useEffect(() => {
+    if (!autoSpeak || turns.length === 0) return;
+    const idx = turns.length - 1;
+    const last = turns[idx];
+    if (last.role === 'assistant' && idx > lastSpokenRef.current) {
+      lastSpokenRef.current = idx;
+      speakText(last.text, language).catch(() => undefined);
+    }
+  }, [turns, autoSpeak, language]);
+
+  // Reset the spoken-index tracker when a new conversation starts.
+  useEffect(() => {
+    lastSpokenRef.current = -1;
+  }, [conversationId]);
 
   useEffect(() => {
     return () => {
@@ -145,16 +164,33 @@ export default function ConversationPage() {
         <h1>
           Conversation <LanguageBadge code={language} />
         </h1>
-        <Button variant="ghost" onClick={reset}>
-          End &amp; new
-        </Button>
+        <div className="head-actions">
+          <label className="autospeak-toggle" title="Speak the tutor's replies aloud">
+            <input
+              type="checkbox"
+              checked={autoSpeak}
+              onChange={(e) => setAutoSpeak(e.target.checked)}
+            />
+            🔊 Auto-speak replies
+          </label>
+          <Button variant="ghost" onClick={reset}>
+            End &amp; new
+          </Button>
+        </div>
       </header>
 
       <Card className="chat-card">
         <div className="chat-window">
           {turns.map((turn, i) => (
-            <div key={i} className={`bubble ${turn.role}`}>
-              <InteractiveText text={turn.text} lang={language} />
+            <div key={i} className={`bubble-row ${turn.role}`}>
+              <div className={`bubble ${turn.role}`}>
+                <InteractiveText text={turn.text} lang={language} />
+              </div>
+              <SpeakButton
+                text={turn.text}
+                lang={language}
+                title="Hear this sentence"
+              />
             </div>
           ))}
           {loading && <div className="bubble assistant typing">Typing…</div>}

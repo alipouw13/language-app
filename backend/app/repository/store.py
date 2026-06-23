@@ -5,14 +5,15 @@ This module is the single persistence boundary for the application. Services
 call these async helpers instead of an ORM; rows are plain ``dict`` objects.
 
 Tables (Delta):
-    users, lessons, exercises, exercise_scores, conversations, conversation_turns
+    users, lessons, exercises, exercise_scores, conversations, conversation_turns,
+    worksheet_submissions, worksheet_responses, date_dim
 """
 
 from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 import pyarrow as pa
@@ -28,6 +29,12 @@ EXERCISES = "exercises"
 EXERCISE_SCORES = "exercise_scores"
 CONVERSATIONS = "conversations"
 CONVERSATION_TURNS = "conversation_turns"
+WORKSHEET_SUBMISSIONS = "worksheet_submissions"
+WORKSHEET_RESPONSES = "worksheet_responses"
+DATE_DIM = "date_dim"
+
+# Calendar dimension is built contiguously from this date forward (for Power BI).
+_DATE_DIM_START = date(2024, 1, 1)
 
 _SCHEMAS: dict[str, pa.Schema] = {
     USERS: pa.schema([
@@ -84,6 +91,65 @@ _SCHEMAS: dict[str, pa.Schema] = {
         ("corrected_text", pa.string()),    # nullable
         ("turn_index", pa.int64()),
         ("created_at", pa.string()),
+    ]),
+    # Worksheet submission header (one row per submitted worksheet).
+    WORKSHEET_SUBMISSIONS: pa.schema([
+        ("submission_id", pa.string()),
+        ("lesson_id", pa.string()),
+        ("user_id", pa.string()),
+        ("target_language", pa.string()),
+        ("mode", pa.string()),
+        ("verb", pa.string()),
+        ("scenario", pa.string()),
+        ("difficulty", pa.string()),
+        ("grammar_focus", pa.string()),
+        ("total_exercises", pa.int64()),
+        ("answered_count", pa.int64()),
+        ("first_correct_count", pa.int64()),
+        ("final_correct_count", pa.int64()),
+        ("first_score_avg", pa.float64()),
+        ("final_score_avg", pa.float64()),
+        ("submitted_at", pa.string()),
+        ("date_key", pa.int64()),
+    ]),
+    # Worksheet response detail (one row per exercise within a submission).
+    WORKSHEET_RESPONSES: pa.schema([
+        ("response_id", pa.string()),
+        ("submission_id", pa.string()),
+        ("lesson_id", pa.string()),
+        ("user_id", pa.string()),
+        ("exercise_id", pa.string()),
+        ("order_index", pa.int64()),
+        ("exercise_type", pa.string()),
+        ("question", pa.string()),
+        ("correct_answer", pa.string()),
+        ("user_answer", pa.string()),
+        ("first_score", pa.float64()),       # nullable
+        ("first_is_correct", pa.bool_()),    # nullable
+        ("final_score", pa.float64()),       # nullable
+        ("final_is_correct", pa.bool_()),    # nullable
+        ("attempts", pa.int64()),
+        ("feedback", pa.string()),           # nullable
+        ("target_language", pa.string()),
+        ("difficulty", pa.string()),
+        ("mode", pa.string()),
+        ("submitted_at", pa.string()),
+        ("date_key", pa.int64()),
+    ]),
+    # Calendar dimension for Power BI (Direct Lake / DirectQuery).
+    DATE_DIM: pa.schema([
+        ("date_key", pa.int64()),            # yyyymmdd
+        ("date", pa.string()),               # yyyy-mm-dd
+        ("year", pa.int64()),
+        ("quarter", pa.int64()),
+        ("month", pa.int64()),
+        ("month_name", pa.string()),
+        ("month_year", pa.string()),         # e.g. "2026-06"
+        ("day", pa.int64()),
+        ("day_of_week", pa.int64()),         # 1=Mon … 7=Sun
+        ("day_name", pa.string()),
+        ("week_of_year", pa.int64()),
+        ("is_weekend", pa.bool_()),
     ]),
 }
 
@@ -394,3 +460,173 @@ async def list_conversations(
         for c in page_items
     ]
     return items, total
+
+
+# --------------------------------------------------------------------------- #
+# Date dimension (Power BI calendar)                                           #
+# --------------------------------------------------------------------------- #
+_MONTHS = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+]
+_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def _date_row(d: date) -> dict[str, Any]:
+    iso_year, iso_week, iso_weekday = d.isocalendar()
+    return {
+        "date_key": int(d.strftime("%Y%m%d")),
+        "date": d.isoformat(),
+        "year": d.year,
+        "quarter": (d.month - 1) // 3 + 1,
+        "month": d.month,
+        "month_name": _MONTHS[d.month - 1],
+        "month_year": d.strftime("%Y-%m"),
+        "day": d.day,
+        "day_of_week": iso_weekday,            # 1=Mon … 7=Sun
+        "day_name": _DAYS[iso_weekday - 1],
+        "week_of_year": int(iso_week),
+        "is_weekend": iso_weekday >= 6,
+    }
+
+
+async def ensure_date_dim(through: date | None = None) -> None:
+    """Ensure the calendar dimension covers up to ``through`` (default: today).
+
+    Rebuilds a contiguous table from ``_DATE_DIM_START`` to one year beyond the
+    needed end date, but only when the existing table doesn't already reach it.
+    """
+    lake = get_lakehouse()
+    schema = _schema(DATE_DIM)
+    target = max(through or date.today(), date.today())
+    needed_key = int(target.strftime("%Y%m%d"))
+
+    existing = await lake.read_all(DATE_DIM, schema)
+    if existing:
+        current_max = max(r["date_key"] for r in existing)
+        if current_max >= needed_key:
+            return
+
+    end = date(target.year + 1, 12, 31)
+    rows: list[dict[str, Any]] = []
+    d = _DATE_DIM_START
+    while d <= end:
+        rows.append(_date_row(d))
+        d += timedelta(days=1)
+    await lake.overwrite(DATE_DIM, rows, schema)
+
+
+# --------------------------------------------------------------------------- #
+# Worksheet submissions                                                        #
+# --------------------------------------------------------------------------- #
+async def create_worksheet_submission(
+    *,
+    user_id: str,
+    lesson: dict[str, Any],
+    responses: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Persist a worksheet submission header + per-exercise response rows.
+
+    ``responses`` is the fully-resolved list (correct answers, first/final
+    scores, attempts, feedback) produced by the submission service. Returns the
+    submission summary header.
+    """
+    lake = get_lakehouse()
+    submission_id = _new_id()
+    now_dt = datetime.now(timezone.utc)
+    submitted_at = now_dt.isoformat()
+    submitted_date = now_dt.date()
+    date_key = int(submitted_date.strftime("%Y%m%d"))
+
+    target_language = lesson["target_language"]
+    difficulty = lesson["difficulty"]
+    mode = lesson.get("mode") or "scenario"
+
+    answered = [r for r in responses if (r.get("user_answer") or "").strip()]
+    first_scores = [r["first_score"] for r in answered if r.get("first_score") is not None]
+    final_scores = [r["final_score"] for r in answered if r.get("final_score") is not None]
+    first_correct = sum(1 for r in answered if r.get("first_is_correct"))
+    final_correct = sum(1 for r in answered if r.get("final_is_correct"))
+
+    header = _coerce(
+        {
+            "submission_id": submission_id,
+            "lesson_id": lesson["id"],
+            "user_id": user_id,
+            "target_language": target_language,
+            "mode": mode,
+            "verb": lesson.get("verb"),
+            "scenario": lesson.get("scenario"),
+            "difficulty": difficulty,
+            "grammar_focus": lesson.get("grammar_focus"),
+            "total_exercises": len(responses),
+            "answered_count": len(answered),
+            "first_correct_count": first_correct,
+            "final_correct_count": final_correct,
+            "first_score_avg": round(sum(first_scores) / len(first_scores), 4) if first_scores else 0.0,
+            "final_score_avg": round(sum(final_scores) / len(final_scores), 4) if final_scores else 0.0,
+            "submitted_at": submitted_at,
+            "date_key": date_key,
+        },
+        _schema(WORKSHEET_SUBMISSIONS),
+    )
+    await lake.append(WORKSHEET_SUBMISSIONS, [header], _schema(WORKSHEET_SUBMISSIONS))
+
+    detail_rows = [
+        _coerce(
+            {
+                "response_id": _new_id(),
+                "submission_id": submission_id,
+                "lesson_id": lesson["id"],
+                "user_id": user_id,
+                "exercise_id": r.get("exercise_id"),
+                "order_index": r.get("order_index", 0),
+                "exercise_type": r.get("exercise_type", ""),
+                "question": r.get("question", ""),
+                "correct_answer": r.get("correct_answer", ""),
+                "user_answer": r.get("user_answer", "") or "",
+                "first_score": r.get("first_score"),
+                "first_is_correct": r.get("first_is_correct"),
+                "final_score": r.get("final_score"),
+                "final_is_correct": r.get("final_is_correct"),
+                "attempts": int(r.get("attempts", 0) or 0),
+                "feedback": r.get("feedback"),
+                "target_language": target_language,
+                "difficulty": difficulty,
+                "mode": mode,
+                "submitted_at": submitted_at,
+                "date_key": date_key,
+            },
+            _schema(WORKSHEET_RESPONSES),
+        )
+        for r in responses
+    ]
+    if detail_rows:
+        await lake.append(WORKSHEET_RESPONSES, detail_rows, _schema(WORKSHEET_RESPONSES))
+
+    await ensure_date_dim(submitted_date)
+
+    return {
+        "submission_id": submission_id,
+        "lesson_id": lesson["id"],
+        "total_exercises": header["total_exercises"],
+        "answered_count": header["answered_count"],
+        "first_score_avg": header["first_score_avg"],
+        "final_score_avg": header["final_score_avg"],
+        "first_correct_count": first_correct,
+        "final_correct_count": final_correct,
+        "submitted_at": submitted_at,
+    }
+
+
+async def list_submissions(
+    user_id: str | None, page: int, page_size: int
+) -> tuple[list[dict[str, Any]], int]:
+    lake = get_lakehouse()
+    subs = await lake.read_all(WORKSHEET_SUBMISSIONS, _schema(WORKSHEET_SUBMISSIONS))
+    if user_id:
+        subs = [s for s in subs if s["user_id"] == user_id]
+    subs.sort(key=lambda s: s["submitted_at"], reverse=True)
+    total = len(subs)
+    start = (page - 1) * page_size
+    return subs[start : start + page_size], total

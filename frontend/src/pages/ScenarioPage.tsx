@@ -15,6 +15,7 @@ export default function ScenarioPage() {
   const [error, setError] = useState<string | null>(null);
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [exerciseIds, setExerciseIds] = useState<string[]>([]);
+  const [lessonId, setLessonId] = useState<string | null>(null);
 
   useEffect(() => setGrammarFocus(''), [language]);
 
@@ -23,6 +24,7 @@ export default function ScenarioPage() {
     setError(null);
     setWorksheet(null);
     setExerciseIds([]);
+    setLessonId(null);
 
     const req: WorksheetRequest = {
       scenario,
@@ -34,6 +36,7 @@ export default function ScenarioPage() {
       const res = await generateWorksheet(req);
       setWorksheet(res.worksheet);
       setExerciseIds(res.exercise_ids ?? []);
+      setLessonId(res.lesson_id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Generation failed');
     } finally {
@@ -114,7 +117,12 @@ export default function ScenarioPage() {
 
       {error && <Alert>{error}</Alert>}
       {worksheet && (
-        <WorksheetView worksheet={worksheet} lang={language} exerciseIds={exerciseIds} />
+        <WorksheetView
+          worksheet={worksheet}
+          lang={language}
+          exerciseIds={exerciseIds}
+          lessonId={lessonId}
+        />
       )}
     </div>
   );

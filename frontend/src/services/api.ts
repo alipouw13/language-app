@@ -12,6 +12,8 @@ import type {
   VerbOption,
   VerbWorksheetRequest,
   WorksheetRequest,
+  WorksheetResponseItem,
+  WorksheetSubmissionResult,
 } from '../types';
 
 const api = axios.create({
@@ -112,6 +114,17 @@ export async function evaluateExercise(
   const { data } = await api.post('/worksheets/evaluate', {
     exercise_id: exerciseId,
     user_answer: userAnswer,
+  });
+  return data;
+}
+
+export async function submitWorksheet(
+  lessonId: string,
+  responses: WorksheetResponseItem[],
+): Promise<WorksheetSubmissionResult> {
+  const { data } = await api.post('/worksheets/submit', {
+    lesson_id: lessonId,
+    responses,
   });
   return data;
 }

@@ -143,7 +143,45 @@ ONELAKE_LAKEHOUSE=<lakehouse-name-or-guid>
 
 The signed-in identity (via `DefaultAzureCredential`) needs **Contributor** on the Fabric
 workspace. Tables are created lazily as Delta tables under the Lakehouse `Tables/` area:
-`users`, `lessons`, `exercises`, `exercise_scores`, `conversations`, `conversation_turns`.
+`users`, `lessons`, `exercises`, `exercise_scores`, `conversations`, `conversation_turns`,
+plus the submission + reporting tables below. Names *or* GUIDs work — GUIDs are used bare
+(no `.Lakehouse` suffix); friendly names get the suffix automatically.
+
+> Tip: with `STORAGE_BACKEND=local` nothing reaches Fabric — that's the dev default. Switch
+> to `onelake` to see data in your Lakehouse.
+
+## Submitting worksheets & Power BI reporting
+
+Finish a worksheet, check your answers (each **Check** records a first score; re-checking a
+corrected answer records the new score), then click **Submit worksheet**. This writes a
+denormalized record to OneLake as Delta tables, ready for Power BI:
+
+| Table | Grain | Key columns |
+|-------|-------|-------------|
+| `worksheet_submissions` | one row per submitted worksheet | `submission_id`, `lesson_id`, `user_id`, `target_language`, `mode`, `verb`, `difficulty`, `grammar_focus`, `total_exercises`, `answered_count`, `first_correct_count`, `final_correct_count`, `first_score_avg`, `final_score_avg`, `submitted_at`, `date_key` |
+| `worksheet_responses` | one row per exercise in a submission | `response_id`, `submission_id`, `exercise_id`, `question`, `correct_answer`, `user_answer`, `first_score`, `first_is_correct`, `final_score`, `final_is_correct`, `attempts`, `feedback`, `exercise_type`, `target_language`, `difficulty`, `date_key` |
+| `date_dim` | one row per calendar day | `date_key` (yyyymmdd), `date`, `year`, `quarter`, `month`, `month_name`, `month_year`, `day`, `day_of_week`, `day_name`, `week_of_year`, `is_weekend` |
+
+The **first score** vs **final (corrected) score** lets you measure improvement after
+correction; `attempts` shows how many tries each exercise took.
+
+### Modeling: Direct Lake vs DirectQuery
+
+The same Delta tables support both storage modes, so you can build two semantic models to
+compare them:
+
+- **Direct Lake** — create a semantic model directly on the Lakehouse tables. Power BI reads
+  the Delta/Parquet files in OneLake with no import and no query translation (fastest;
+  refresh-free). Relate `worksheet_responses[date_key]` and `worksheet_submissions[date_key]`
+  to `date_dim[date_key]`.
+- **DirectQuery** — connect to the Lakehouse **SQL analytics endpoint** and build the model
+  in DirectQuery mode. Each visual issues T-SQL to the endpoint at query time. Use the same
+  relationships; this is the apples-to-apples comparison to Direct Lake.
+
+Suggested model: `date_dim` (1→*) `worksheet_submissions` (1→*) `worksheet_responses`, with
+`date_dim` marked as the date table. Example measures: first-try accuracy
+(`final_correct_count / answered_count`), improvement (`final_score_avg - first_score_avg`),
+and area-of-improvement breakdowns by `exercise_type`, `grammar_focus` or `verb`.
 
 ## API endpoints
 
@@ -153,11 +191,13 @@ workspace. Tables are created lazily as Delta tables under the Lakehouse `Tables
 | `POST` | `/api/worksheets/verb` | Generate a verb-focused worksheet |
 | `GET`  | `/api/worksheets/verbs` | Curated verb list for the picker |
 | `POST` | `/api/worksheets/evaluate` | Score an exercise answer |
+| `POST` | `/api/worksheets/submit` | Submit a completed worksheet to OneLake |
 | `POST` | `/api/translate` | Translate text (Foundry translation model) |
 | `POST` | `/api/conversations` | Start a conversation |
 | `POST` | `/api/conversations/{id}/message` | Send a message |
 | `WS`   | `/api/conversations/{id}/ws` | Voice/text streaming |
 | `POST` | `/api/speech/transcribe` | Speech-to-text |
+| `POST` | `/api/speech/tts` | Text-to-speech (word pronunciation) |
 | `GET`  | `/api/lessons` | List saved worksheets |
 | `GET`  | `/api/lessons/conversations` | List conversations |
 

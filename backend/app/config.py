@@ -88,9 +88,24 @@ class Settings(BaseSettings):
 
     @property
     def onelake_tables_uri(self) -> str:
-        """abfss base URI for the Lakehouse 'Tables' area."""
+        """abfss base URI for the Lakehouse 'Tables' area.
+
+        OneLake accepts either GUIDs or friendly names. A friendly lakehouse
+        name takes a ``.Lakehouse`` item-type suffix, but a GUID must be used
+        bare (appending the suffix triggers ``FriendlyNameSupportDisabled``).
+        """
+        import re
+
+        guid_re = re.compile(
+            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+            r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        )
         lakehouse = self.onelake_lakehouse
-        if lakehouse and not lakehouse.lower().endswith(".lakehouse"):
+        if (
+            lakehouse
+            and not guid_re.match(lakehouse)
+            and not lakehouse.lower().endswith(".lakehouse")
+        ):
             lakehouse = f"{lakehouse}.Lakehouse"
         return (
             f"abfss://{self.onelake_workspace}@{self.onelake_host}/"

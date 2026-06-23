@@ -83,6 +83,40 @@ class ExerciseEvaluation(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# Worksheet submission (persisted to OneLake for Power BI)                      #
+# --------------------------------------------------------------------------- #
+class WorksheetResponseItem(BaseModel):
+    exercise_id: str
+    order_index: int = 0
+    exercise_type: str = ""
+    question: str = ""
+    user_answer: str = ""
+    first_score: float | None = None
+    first_is_correct: bool | None = None
+    final_score: float | None = None
+    final_is_correct: bool | None = None
+    attempts: int = 0
+    feedback: str | None = None
+
+
+class WorksheetSubmissionRequest(BaseModel):
+    lesson_id: str
+    responses: list[WorksheetResponseItem] = Field(default_factory=list)
+
+
+class WorksheetSubmissionResult(BaseModel):
+    submission_id: str
+    lesson_id: str
+    total_exercises: int
+    answered_count: int
+    first_score_avg: float
+    final_score_avg: float
+    first_correct_count: int
+    final_correct_count: int
+    submitted_at: datetime
+
+
+# --------------------------------------------------------------------------- #
 # Translation (Foundry translation model)                                      #
 # --------------------------------------------------------------------------- #
 class TranslationRequest(BaseModel):

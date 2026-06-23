@@ -22,10 +22,13 @@ from app.models.pydantic_models import (
     VerbWorksheetRequest,
     WorksheetRequest,
     WorksheetResponse,
+    WorksheetSubmissionRequest,
+    WorksheetSubmissionResult,
 )
 from app.repository import store
 from app.services import verbs
 from app.services.evaluation_service import evaluate_answer
+from app.services.submission_service import submit_worksheet
 from app.services.worksheet_generator import (
     generate_and_persist_scenario,
     generate_and_persist_verb,
@@ -137,4 +140,21 @@ async def evaluate_exercise(
         raise HTTPException(status_code=404, detail=str(exc))
     except Exception as exc:
         logger.exception("Evaluation failed")
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.post("/submit", response_model=WorksheetSubmissionResult)
+async def submit_worksheet_endpoint(
+    req: WorksheetSubmissionRequest,
+    principal: Principal = Depends(get_principal),
+):
+    """Submit a completed worksheet — writes a denormalized record (questions,
+    answers, first + corrected scores) to OneLake for Power BI reporting."""
+    try:
+        user_id = await store.get_or_create_user(principal.id, display_name=principal.name or "Learner")
+        return await submit_worksheet(req.lesson_id, req.responses, user_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except Exception as exc:
+        logger.exception("Worksheet submission failed")
         raise HTTPException(status_code=500, detail=str(exc))

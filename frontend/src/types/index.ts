@@ -78,6 +78,32 @@ export interface ExerciseEvaluation {
   correct_answer: string;
 }
 
+export interface WorksheetResponseItem {
+  exercise_id: string;
+  order_index: number;
+  exercise_type: string;
+  question: string;
+  user_answer: string;
+  first_score: number | null;
+  first_is_correct: boolean | null;
+  final_score: number | null;
+  final_is_correct: boolean | null;
+  attempts: number;
+  feedback: string | null;
+}
+
+export interface WorksheetSubmissionResult {
+  submission_id: string;
+  lesson_id: string;
+  total_exercises: number;
+  answered_count: number;
+  first_score_avg: number;
+  final_score_avg: number;
+  first_correct_count: number;
+  final_correct_count: number;
+  submitted_at: string;
+}
+
 export interface VerbOption {
   verb: string;
   gloss: string;

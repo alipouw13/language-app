@@ -17,6 +17,7 @@ export default function VerbPracticePage() {
   const [error, setError] = useState<string | null>(null);
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [exerciseIds, setExerciseIds] = useState<string[]>([]);
+  const [lessonId, setLessonId] = useState<string | null>(null);
 
   useEffect(() => {
     setTense('');
@@ -36,6 +37,7 @@ export default function VerbPracticePage() {
     setError(null);
     setWorksheet(null);
     setExerciseIds([]);
+    setLessonId(null);
 
     const req: VerbWorksheetRequest = {
       verb: verb.trim(),
@@ -48,6 +50,7 @@ export default function VerbPracticePage() {
       const res = await generateVerbWorksheet(req);
       setWorksheet(res.worksheet);
       setExerciseIds(res.exercise_ids ?? []);
+      setLessonId(res.lesson_id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Generation failed');
     } finally {
@@ -154,7 +157,12 @@ export default function VerbPracticePage() {
 
       {error && <Alert>{error}</Alert>}
       {worksheet && (
-        <WorksheetView worksheet={worksheet} lang={language} exerciseIds={exerciseIds} />
+        <WorksheetView
+          worksheet={worksheet}
+          lang={language}
+          exerciseIds={exerciseIds}
+          lessonId={lessonId}
+        />
       )}
     </div>
   );

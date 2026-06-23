@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="Architecture" id="lingua-foundry-arch">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Lingua Foundry — Language Learning on Azure AI Foundry &amp; Microsoft Fabric OneLake" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;fontColor=#1b2235;" vertex="1" parent="1">
+          <mxGeometry x="60" y="20" width="1060" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="&#128100; User (browser)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="400" y="70" width="240" height="56" as="geometry" />
+        </mxCell>
+
+        <mxCell id="fe" value="Frontend — React + Vite SPA (TypeScript)" style="swimlane;startSize=30;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1f3b6e;fontStyle=1;fontSize=13;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="840" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_pages" value="Pages&#xa;Worksheets · Verb Practice · Conversation · Translate · History/Progress" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="fe">
+          <mxGeometry x="20" y="44" width="420" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_inter" value="InteractiveText + SpeakButton&#xa;hover → translate · click → speak" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="fe">
+          <mxGeometry x="460" y="44" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_msal" value="MSAL&#xa;Entra sign-in" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="fe">
+          <mxGeometry x="690" y="44" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="be" value="Backend — FastAPI (async)" style="swimlane;startSize=30;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#244a1c;fontStyle=1;fontSize=13;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="360" width="840" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="be_api" value="API routes&#xa;/worksheets · /worksheets/verb&#xa;/worksheets/submit · /translate&#xa;/conversations (+ WebSocket)&#xa;/speech (STT + TTS)&#xa;/lessons (+ /submissions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="be">
+          <mxGeometry x="20" y="44" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="be_svc" value="Services&#xa;llm_service (param-adaptive)&#xa;translation_service&#xa;speech_service&#xa;worksheet_generator&#xa;conversation_service&#xa;evaluation_service&#xa;submission_service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="be">
+          <mxGeometry x="340" y="44" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="be_repo" value="Repository&#xa;Lakehouse store&#xa;(delta-rs)&#xa;reads + writes&#xa;Delta tables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="be">
+          <mxGeometry x="620" y="44" width="190" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="entra" value="Microsoft Entra ID&#xa;(Azure AD)&#xa;&#xa;SPA: token acquisition&#xa;API: JWKS validation&#xa;Services: DefaultAzureCredential" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#43275c;fontStyle=1;fontSize=12;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="160" width="160" height="450" as="geometry" />
+        </mxCell>
+
+        <mxCell id="foundry" value="Azure AI Foundry (Entra auth)" style="swimlane;startSize=30;html=1;whiteSpace=wrap;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#7a4f00;fontStyle=1;fontSize=13;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="680" width="520" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="f_chat" value="Chat model&#xa;gpt-4.1-mini / gpt-5.x&#xa;worksheets · eval · chat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="foundry">
+          <mxGeometry x="20" y="44" width="230" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="f_trans" value="Translation model&#xa;(chat-model fallback)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="foundry">
+          <mxGeometry x="270" y="44" width="230" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="f_stt" value="Speech-to-text&#xa;gpt-4o-transcribe" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="foundry">
+          <mxGeometry x="20" y="110" width="230" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="f_tts" value="Text-to-speech&#xa;gpt-4o-mini-tts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="foundry">
+          <mxGeometry x="270" y="110" width="230" height="56" as="geometry" />
+        </mxCell>
+
+        <mxCell id="onelake" value="Microsoft Fabric — OneLake Lakehouse (Delta tables)" style="swimlane;startSize=30;html=1;whiteSpace=wrap;rounded=1;fillColor=#d4e1f5;strokeColor=#3b6fb5;fontColor=#1f3b6e;fontStyle=1;fontSize=13;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="640" y="680" width="480" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ol_core" value="users · lessons · exercises&#xa;exercise_scores&#xa;conversations · conversation_turns" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b6fb5;fontSize=11;verticalAlign=top;spacingTop=12;" vertex="1" parent="onelake">
+          <mxGeometry x="20" y="44" width="220" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ol_rep" value="worksheet_submissions&#xa;worksheet_responses&#xa;date_dim (calendar)" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b6fb5;fontSize=11;verticalAlign=top;spacingTop=12;" vertex="1" parent="onelake">
+          <mxGeometry x="260" y="44" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pbi" value="Power BI&#xa;Direct Lake &amp; DirectQuery models" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#7a5b00;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="900" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_user_fe" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;endArrow=classic;" edge="1" parent="1" source="user" target="fe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fe_entra" value="sign in (OAuth2 / OIDC)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" edge="1" parent="1" source="fe_msal" target="entra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_fe_be" value="HTTPS REST + Bearer token&#xa;WebSocket (voice)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;startArrow=classic;endArrow=classic;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="fe" target="be">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_be_entra" value="validate JWT (JWKS)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="be" target="entra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_be_foundry" value="chat · translate · STT · TTS&#xa;(DefaultAzureCredential)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;startArrow=classic;endArrow=classic;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="be" target="foundry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_repo_onelake" value="abfss + Entra token&#xa;read / write Delta" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;startArrow=classic;endArrow=classic;exitX=0.85;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="be" target="onelake">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pbi_onelake" value="Direct Lake / DirectQuery" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="pbi" target="onelake">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

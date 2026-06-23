@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1000" viewBox="0 0 1180 1000" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#555555"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="1000" fill="#ffffff"/>
+
+  <text x="590" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#1b2235">Lingua Foundry — Language Learning on Azure AI Foundry &amp; Microsoft Fabric OneLake</text>
+
+  <!-- User -->
+  <rect x="400" y="70" width="240" height="56" rx="10" fill="#f5f5f5" stroke="#666666" stroke-width="1.5"/>
+  <text x="520" y="104" text-anchor="middle" font-size="14" fill="#333333">&#128100;  User (browser)</text>
+
+  <!-- Frontend band -->
+  <rect x="60" y="160" width="840" height="140" rx="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+  <text x="76" y="184" font-size="13" font-weight="700" fill="#1f3b6e">Frontend — React + Vite SPA (TypeScript)</text>
+  <rect x="80" y="200" width="420" height="84" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.2"/>
+  <text x="290" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">Pages</text>
+  <text x="290" y="254" text-anchor="middle" font-size="11" fill="#44506a">Worksheets · Verb Practice · Conversation</text>
+  <text x="290" y="270" text-anchor="middle" font-size="11" fill="#44506a">Translate · History / Progress</text>
+  <rect x="514" y="200" width="210" height="84" rx="8" fill="#ffffff" stroke="#6c8ebf" stroke-width="1.2"/>
+  <text x="619" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">InteractiveText + Speak</text>
+  <text x="619" y="254" text-anchor="middle" font-size="11" fill="#44506a">hover → translate</text>
+  <text x="619" y="270" text-anchor="middle" font-size="11" fill="#44506a">click → speak</text>
+  <rect x="738" y="200" width="142" height="84" rx="8" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.2"/>
+  <text x="809" y="238" text-anchor="middle" font-size="12" font-weight="600" fill="#43275c">MSAL</text>
+  <text x="809" y="258" text-anchor="middle" font-size="11" fill="#5a3f73">Entra sign-in</text>
+
+  <!-- Backend band -->
+  <rect x="60" y="360" width="840" height="250" rx="10" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+  <text x="76" y="384" font-size="13" font-weight="700" fill="#244a1c">Backend — FastAPI (async)</text>
+  <!-- API routes -->
+  <rect x="80" y="400" width="300" height="190" rx="8" fill="#ffffff" stroke="#82b366" stroke-width="1.2"/>
+  <text x="94" y="424" font-size="12" font-weight="600" fill="#1b2235">API routes</text>
+  <text x="94" y="446" font-size="11" fill="#3a5530">/worksheets · /worksheets/verb</text>
+  <text x="94" y="464" font-size="11" fill="#3a5530">/worksheets/submit · /translate</text>
+  <text x="94" y="482" font-size="11" fill="#3a5530">/conversations  (+ WebSocket)</text>
+  <text x="94" y="500" font-size="11" fill="#3a5530">/speech  (STT + TTS)</text>
+  <text x="94" y="518" font-size="11" fill="#3a5530">/lessons  (+ /submissions)</text>
+  <text x="94" y="546" font-size="10" fill="#6a7d60">Entra JWT validation on every route</text>
+  <!-- Services -->
+  <rect x="400" y="400" width="260" height="190" rx="8" fill="#ffffff" stroke="#82b366" stroke-width="1.2"/>
+  <text x="414" y="424" font-size="12" font-weight="600" fill="#1b2235">Services</text>
+  <text x="414" y="446" font-size="11" fill="#3a5530">llm_service  (param-adaptive)</text>
+  <text x="414" y="464" font-size="11" fill="#3a5530">translation_service</text>
+  <text x="414" y="482" font-size="11" fill="#3a5530">speech_service</text>
+  <text x="414" y="500" font-size="11" fill="#3a5530">worksheet_generator</text>
+  <text x="414" y="518" font-size="11" fill="#3a5530">conversation_service</text>
+  <text x="414" y="536" font-size="11" fill="#3a5530">evaluation_service</text>
+  <text x="414" y="554" font-size="11" fill="#3a5530">submission_service</text>
+  <!-- Repository -->
+  <rect x="680" y="400" width="190" height="190" rx="8" fill="#ffffff" stroke="#82b366" stroke-width="1.2"/>
+  <text x="694" y="424" font-size="12" font-weight="600" fill="#1b2235">Repository</text>
+  <text x="694" y="446" font-size="11" fill="#3a5530">Lakehouse store</text>
+  <text x="694" y="464" font-size="11" fill="#3a5530">(delta-rs)</text>
+  <text x="694" y="486" font-size="11" fill="#3a5530">reads + writes</text>
+  <text x="694" y="504" font-size="11" fill="#3a5530">Delta tables</text>
+
+  <!-- Entra ID -->
+  <rect x="960" y="160" width="160" height="450" rx="10" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+  <text x="1040" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#43275c">Microsoft Entra ID</text>
+  <text x="1040" y="208" text-anchor="middle" font-size="11" fill="#5a3f73">(Azure AD)</text>
+  <text x="1040" y="246" text-anchor="middle" font-size="11" fill="#43275c" font-weight="600">SPA</text>
+  <text x="1040" y="264" text-anchor="middle" font-size="10" fill="#5a3f73">token acquisition</text>
+  <text x="1040" y="300" text-anchor="middle" font-size="11" fill="#43275c" font-weight="600">API</text>
+  <text x="1040" y="318" text-anchor="middle" font-size="10" fill="#5a3f73">JWKS validation</text>
+  <text x="1040" y="354" text-anchor="middle" font-size="11" fill="#43275c" font-weight="600">Services</text>
+  <text x="1040" y="372" text-anchor="middle" font-size="10" fill="#5a3f73">DefaultAzure-</text>
+  <text x="1040" y="386" text-anchor="middle" font-size="10" fill="#5a3f73">Credential</text>
+
+  <!-- AI Foundry band -->
+  <rect x="60" y="680" width="520" height="180" rx="10" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+  <text x="76" y="704" font-size="13" font-weight="700" fill="#7a4f00">Azure AI Foundry  (Entra auth)</text>
+  <rect x="80" y="720" width="230" height="58" rx="8" fill="#ffffff" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="195" y="743" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">Chat model</text>
+  <text x="195" y="762" text-anchor="middle" font-size="10" fill="#7a4f00">gpt-4.1-mini / gpt-5.x · worksheets·eval·chat</text>
+  <rect x="330" y="720" width="230" height="58" rx="8" fill="#ffffff" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="445" y="743" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">Translation model</text>
+  <text x="445" y="762" text-anchor="middle" font-size="10" fill="#7a4f00">(chat-model fallback)</text>
+  <rect x="80" y="788" width="230" height="58" rx="8" fill="#ffffff" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="195" y="811" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">Speech-to-text</text>
+  <text x="195" y="830" text-anchor="middle" font-size="10" fill="#7a4f00">gpt-4o-transcribe</text>
+  <rect x="330" y="788" width="230" height="58" rx="8" fill="#ffffff" stroke="#d79b00" stroke-width="1.2"/>
+  <text x="445" y="811" text-anchor="middle" font-size="12" font-weight="600" fill="#1b2235">Text-to-speech</text>
+  <text x="445" y="830" text-anchor="middle" font-size="10" fill="#7a4f00">gpt-4o-mini-tts</text>
+
+  <!-- OneLake band -->
+  <rect x="640" y="680" width="480" height="180" rx="10" fill="#d4e1f5" stroke="#3b6fb5" stroke-width="1.5"/>
+  <text x="656" y="704" font-size="13" font-weight="700" fill="#1f3b6e">Microsoft Fabric — OneLake Lakehouse (Delta)</text>
+  <rect x="660" y="720" width="220" height="124" rx="8" fill="#ffffff" stroke="#3b6fb5" stroke-width="1.2"/>
+  <text x="770" y="742" text-anchor="middle" font-size="11" font-weight="600" fill="#1b2235">Core tables</text>
+  <text x="770" y="762" text-anchor="middle" font-size="10" fill="#2c4f80">users · lessons · exercises</text>
+  <text x="770" y="780" text-anchor="middle" font-size="10" fill="#2c4f80">exercise_scores</text>
+  <text x="770" y="798" text-anchor="middle" font-size="10" fill="#2c4f80">conversations</text>
+  <text x="770" y="816" text-anchor="middle" font-size="10" fill="#2c4f80">conversation_turns</text>
+  <rect x="900" y="720" width="200" height="124" rx="8" fill="#ffffff" stroke="#3b6fb5" stroke-width="1.2"/>
+  <text x="1000" y="742" text-anchor="middle" font-size="11" font-weight="600" fill="#1b2235">Reporting tables</text>
+  <text x="1000" y="764" text-anchor="middle" font-size="10" fill="#2c4f80">worksheet_submissions</text>
+  <text x="1000" y="782" text-anchor="middle" font-size="10" fill="#2c4f80">worksheet_responses</text>
+  <text x="1000" y="804" text-anchor="middle" font-size="10" fill="#2c4f80">date_dim (calendar)</text>
+
+  <!-- Power BI -->
+  <rect x="760" y="900" width="240" height="60" rx="10" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5"/>
+  <text x="880" y="926" text-anchor="middle" font-size="13" font-weight="700" fill="#7a5b00">Power BI</text>
+  <text x="880" y="945" text-anchor="middle" font-size="11" fill="#7a5b00">Direct Lake &amp; DirectQuery models</text>
+
+  <!-- Edges -->
+  <!-- User <-> Frontend -->
+  <line x1="520" y1="126" x2="520" y2="160" stroke="#555555" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+  <!-- Frontend MSAL -> Entra (sign in) -->
+  <polyline points="880,242 920,242 920,210 960,210" fill="none" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="884" y="214" width="118" height="16" fill="#ffffff" opacity="0.85"/>
+  <text x="888" y="226" font-size="10" fill="#444444">sign in (OIDC)</text>
+
+  <!-- Frontend <-> Backend -->
+  <line x1="360" y1="300" x2="360" y2="360" stroke="#555555" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <rect x="368" y="312" width="232" height="34" fill="#ffffff" opacity="0.85"/>
+  <text x="372" y="326" font-size="10" fill="#444444">HTTPS REST + Bearer token</text>
+  <text x="372" y="340" font-size="10" fill="#444444">WebSocket (voice)</text>
+
+  <!-- Backend -> Entra (validate JWT) -->
+  <polyline points="900,450 930,450 930,430 960,430" fill="none" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="836" y="424" width="120" height="16" fill="#ffffff" opacity="0.85"/>
+  <text x="840" y="436" font-size="10" fill="#444444">validate JWT (JWKS)</text>
+
+  <!-- Backend <-> AI Foundry -->
+  <line x1="270" y1="610" x2="270" y2="680" stroke="#555555" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <rect x="120" y="628" width="290" height="34" fill="#ffffff" opacity="0.9"/>
+  <text x="126" y="642" font-size="10" fill="#444444">chat · translate · STT · TTS</text>
+  <text x="126" y="656" font-size="10" fill="#444444">(DefaultAzureCredential)</text>
+
+  <!-- Backend <-> OneLake -->
+  <polyline points="775,610 775,645 880,645 880,680" fill="none" stroke="#555555" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <rect x="660" y="628" width="180" height="34" fill="#ffffff" opacity="0.9"/>
+  <text x="666" y="642" font-size="10" fill="#444444">abfss + Entra token</text>
+  <text x="666" y="656" font-size="10" fill="#444444">read / write Delta tables</text>
+
+  <!-- Power BI -> OneLake -->
+  <line x1="880" y1="900" x2="880" y2="860" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="884" y="868" width="150" height="16" fill="#ffffff" opacity="0.85"/>
+  <text x="888" y="880" font-size="10" fill="#444444">Direct Lake / DirectQuery</text>
+</svg>

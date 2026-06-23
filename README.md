@@ -14,25 +14,42 @@ real conversations by voice or text. Everything is secured with **Microsoft Entr
 - **Verb practice** — pick a verb (or type your own) and get a worksheet centred on its
   conjugations, two-way translations, and use in real sentences and conversations.
 - **Translate** — powered by a dedicated Azure AI Foundry translation deployment
-  (falls back to the chat model when none is configured).
+  (falls back to the chat model when none is configured); speak the source text and each
+  translation aloud.
 - **Conversation practice** — chat with an AI tutor by text or microphone; speech is
-  transcribed with a Foundry speech-to-text model and replies can be spoken back.
-- **History** — every worksheet and conversation is persisted to OneLake and browsable
-  per user.
+  transcribed with a Foundry speech-to-text model and the tutor's replies are spoken back
+  so you hear the pronunciation.
+- **Interactive words everywhere** — hover any target-language word for an instant English
+  tooltip, or click it to hear it pronounced (Foundry text-to-speech).
+- **Submit & track progress** — submit a finished worksheet to persist a denormalized
+  record (questions, answers, first vs corrected scores, attempts) to OneLake, then review
+  it under **History → Progress**. Ready for Power BI reporting.
+- **History** — every worksheet, conversation and submission is persisted to OneLake and
+  browsable per user.
 
 ## Architecture
+
+![Architecture](docs/architecture.svg)
+
+> Editable source: [`docs/architecture.drawio`](docs/architecture.drawio) (open in
+> [draw.io](https://www.drawio.com/)). The diagram was authored with the
+> [drawio-skill](https://github.com/Agents365-ai/drawio-skill).
 
 | Layer | Technology |
 |-------|------------|
 | Frontend | React + Vite + TypeScript, MSAL (Entra ID) |
 | Backend | FastAPI (async), Entra JWT validation |
 | Data | **Microsoft Fabric OneLake Lakehouse** — Delta tables via `deltalake` |
-| AI | Azure AI Foundry: chat (`gpt-4.1-mini`), translation, STT (`gpt-4o-transcribe`), TTS (`gpt-4o-mini-tts`) |
+| AI | Azure AI Foundry: chat (`gpt-4.1-mini`/`gpt-5.x`), translation, STT (`gpt-4o-transcribe`), TTS (`gpt-4o-mini-tts`) |
+| Reporting | Power BI on OneLake — Direct Lake and DirectQuery semantic models |
 | Auth | Microsoft Entra ID end-to-end (`DefaultAzureCredential` for services, bearer tokens for the API) |
 
 The data layer is **config-driven**: the same Delta-table code writes to a local
 directory in development (`STORAGE_BACKEND=local`) or to a Fabric Lakehouse over
-`abfss` in production (`STORAGE_BACKEND=onelake`), authenticated with Entra ID.
+`abfss` in production (`STORAGE_BACKEND=onelake`), authenticated with Entra ID. The
+LLM client adapts its parameters per deployment, so both older (`gpt-4.1-mini`,
+`max_tokens`) and newer (`gpt-5.x`, `max_completion_tokens`, default temperature) models
+work unchanged.
 
 ## Prerequisites
 
@@ -197,9 +214,11 @@ and area-of-improvement breakdowns by `exercise_type`, `grammar_focus` or `verb`
 | `POST` | `/api/conversations/{id}/message` | Send a message |
 | `WS`   | `/api/conversations/{id}/ws` | Voice/text streaming |
 | `POST` | `/api/speech/transcribe` | Speech-to-text |
-| `POST` | `/api/speech/tts` | Text-to-speech (word pronunciation) |
+| `POST` | `/api/speech/tts` | Text-to-speech (word & sentence pronunciation) |
 | `GET`  | `/api/lessons` | List saved worksheets |
 | `GET`  | `/api/lessons/conversations` | List conversations |
+| `GET`  | `/api/lessons/submissions` | List worksheet submissions (progress) |
+| `GET`  | `/api/lessons/submissions/{id}` | Submission detail with response rows |
 
 ## Project structure
 
@@ -207,16 +226,19 @@ and area-of-improvement breakdowns by `exercise_type`, `grammar_focus` or `verb`
 backend/app/
 ├── api/           # Route handlers (Entra-protected)
 ├── auth/          # Entra ID JWT validation
-├── services/      # LLM, translation, speech, worksheet, conversation logic
-├── repository/    # Fabric OneLake Lakehouse (Delta) data layer
+├── services/      # LLM, translation, speech, worksheet, conversation, submission logic
+├── repository/    # Fabric OneLake Lakehouse (Delta) data layer + entity store
 ├── models/        # Pydantic schemas
 └── config.py
 frontend/src/
-├── pages/         # Scenario, Verb practice, Conversation, Translate, History
-├── components/    # Layout + reusable UI + worksheet renderer
+├── pages/         # Scenario, Verb practice, Conversation, Translate, History (+Progress)
+├── components/    # Layout, reusable UI, worksheet renderer, InteractiveText, SpeakButton
 ├── auth/          # MSAL config, provider, token acquisition
 ├── services/      # API + WebSocket clients
 └── state/
+docs/
+├── architecture.drawio   # Editable architecture diagram (draw.io)
+└── architecture.svg      # Rendered diagram (embedded in this README)
 ```
 
 ## License

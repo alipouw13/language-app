@@ -208,17 +208,31 @@ back to recency + level (no vectors). So the whole loop works offline with the b
 
 ### Ingesting news
 
+Run these from the `backend/` folder **with the venv activated** (the x64 venv from
+Quick start — `deltalake` needs it), so `backend/.env` is loaded:
+
 ```bash
 cd backend
+venv\Scripts\activate            # Windows (or: source venv/bin/activate)
+
 # Offline: enrich bundled sample headlines (no network, no Fabric) — great for a first run
-python ../scripts/ingest_news.py --source sample
+python ..\scripts\ingest_news.py --source sample
+
+# On demand: generate fresh, unique articles every run (no GDELT rate limits)
+python ..\scripts\ingest_news.py --source synthetic --languages es fr --count 12
 
 # Live: pull fresh headlines from GDELT for the configured languages
-python ../scripts/ingest_news.py --source gdelt --languages es fr
+python ..\scripts\ingest_news.py --source gdelt --languages es fr
 ```
+
+> **Wrong-directory error?** `python ../scripts/ingest_news.py` only resolves from inside
+> `backend/`. From the repo root, drop the `..` (`python scripts\ingest_news.py …`). Either
+> way you must use the project venv — a system/ARM64 Python will fail to import `deltalake`.
+> The scripts load `backend/.env` automatically regardless of the working directory.
 
 > GDELT is free and rate-limited (~1 request / 5s per IP); the runner paces requests between
 > languages. Enriched records are deduped by a stable `news_id` derived from the article URL.
+> If GDELT is cooling down, use `--source synthetic` to populate the store instantly.
 
 Or let the API poll on a timer (uses the same ingestion path):
 
@@ -343,12 +357,14 @@ and example measures are documented in the Gold notebook's closing cell.
 ### Sample data
 
 Populate every table with realistic, report-ready data (50 `Sample User N`,
-1k–5k rows per fact table, timestamps spread over the past month):
+1k–5k rows per fact table, timestamps spread over the past month). Run from
+`backend/` with the venv activated (same x64 venv as above):
 
 ```bash
 cd backend
-python ../scripts/seed_sample_data.py --dry-run   # validate against schemas, no writes
-python ../scripts/seed_sample_data.py             # seed the configured backend (dbo)
+venv\Scripts\activate
+python ..\scripts\seed_sample_data.py --dry-run   # validate against schemas, no writes
+python ..\scripts\seed_sample_data.py             # seed the configured backend (dbo)
 ```
 
 It writes **through the app's own data layer**, so rows always match the
@@ -356,7 +372,7 @@ authoritative schema and land in the configured `ONELAKE_SCHEMA` (`dbo`). Sample
 users use the GUID prefix `5a3b1e00…` — remove them anytime with
 `… where user_id LIKE '5a3b1e00%'`. A companion migration adds + backfills the
 conversation `news_id` column on an existing lakehouse:
-`python ../scripts/migrate_add_conversation_news_id.py`.
+`python ..\scripts\migrate_add_conversation_news_id.py`.
 
 ## API endpoints
 
@@ -391,7 +407,7 @@ backend/app/
 ├── models/        # Pydantic schemas
 └── config.py
 scripts/
-├── ingest_news.py        # GDELT → Foundry enrich → RTI store (--source sample|gdelt)
+├── ingest_news.py        # GDELT → Foundry enrich → RTI store (--source sample|synthetic|gdelt)
 ├── seed_sample_data.py   # Realistic sample data into the Lakehouse (dbo)
 └── migrate_add_conversation_news_id.py   # Add + backfill conversations.news_id
 frontend/src/

@@ -156,6 +156,8 @@ async def enrich_article(article: dict, language: str, level: str) -> dict:
 async def _gather_articles(language: str, *, source: str, max_records: int, timespan: str, query: str | None) -> list[dict]:
     if source == "sample":
         return news_gdelt.sample_articles(language)
+    if source == "synthetic":
+        return news_gdelt.synthetic_articles(language, count=max_records)
     try:
         return await news_gdelt.fetch_articles(
             language, timespan=timespan, max_records=max_records, query=query
@@ -173,11 +175,16 @@ async def ingest_language(
     max_records: int | None = None,
     timespan: str | None = None,
     query: str | None = None,
+    count: int | None = None,
 ) -> dict:
     """Fetch, dedup, enrich and store news for one language."""
     s = get_settings()
     level = (level or s.news_default_level).upper()
-    max_records = max_records or s.gdelt_max_records
+    # For the synthetic source, --count controls how many to generate.
+    if source == "synthetic":
+        max_records = count or max_records or 8
+    else:
+        max_records = max_records or s.gdelt_max_records
     timespan = timespan or s.gdelt_timespan
     if query is None:
         query = getattr(s, f"gdelt_query_{language}", "") or None
@@ -246,6 +253,7 @@ async def ingest_all(
     languages: list[str] | None = None,
     level: str | None = None,
     source: str = "gdelt",
+    count: int | None = None,
 ) -> dict:
     """Ingest news for every configured language (paced for the GDELT rate limit)."""
     s = get_settings()
@@ -254,7 +262,7 @@ async def ingest_all(
     for idx, lang in enumerate(languages):
         if source == "gdelt" and idx > 0:
             await asyncio.sleep(6)  # respect GDELT's ~1 request / 5s limit
-        results.append(await ingest_language(lang, level=level, source=source))
+        results.append(await ingest_language(lang, level=level, source=source, count=count))
     totals = {
         "languages": languages,
         "fetched": sum(r["fetched"] for r in results),

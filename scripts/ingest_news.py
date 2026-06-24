@@ -42,6 +42,7 @@ async def _run(args: argparse.Namespace) -> None:
         languages=args.languages,
         level=args.level,
         source=args.source,
+        count=args.count,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
@@ -49,9 +50,17 @@ async def _run(args: argparse.Namespace) -> None:
         print(
             "\nNo articles fetched. GDELT's free API rate-limits by IP "
             "(1 request / 5s) and penalizes bursts with an extended cooldown.\n"
-            "  • Wait ~15-30 minutes, then retry.\n"
-            "  • Or populate immediately with the offline fixture:\n"
-            "        python scripts/ingest_news.py --source sample",
+            "  • Wait ~15-30 minutes, then retry, or\n"
+            "  • Generate fresh articles instantly (no network):\n"
+            "        python scripts/ingest_news.py --source synthetic",
+            file=sys.stderr,
+        )
+    elif args.source in ("sample",) and result.get("new", 0) == 0 and result.get("fetched", 0):
+        print(
+            "\nAll fetched articles were already stored (deduped by URL), so "
+            "nothing new was ingested.\n"
+            "  • To add fresh, unique articles every run, use:\n"
+            "        python scripts/ingest_news.py --source synthetic",
             file=sys.stderr,
         )
 
@@ -62,9 +71,19 @@ def main() -> None:
     parser.add_argument("--level", default=None, help="CEFR level to grade for (A1..C2)")
     parser.add_argument(
         "--source",
-        choices=["gdelt", "sample"],
+        choices=["gdelt", "synthetic", "sample"],
         default="gdelt",
-        help="News source: live GDELT, or the offline sample fixture",
+        help=(
+            "News source: 'gdelt' (live, rate-limited), 'synthetic' (fresh "
+            "generated articles every run — no network, always ingests), or "
+            "'sample' (fixed offline fixture)"
+        ),
+    )
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=None,
+        help="Articles per language for the synthetic source (default 8)",
     )
     asyncio.run(_run(parser.parse_args()))
 

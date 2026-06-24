@@ -314,6 +314,50 @@ Suggested model: `date_dim` (1→*) `worksheet_submissions` (1→*) `worksheet_r
 (`final_correct_count / answered_count`), improvement (`final_score_avg - first_score_avg`),
 and area-of-improvement breakdowns by `exercise_type`, `grammar_focus` or `verb`.
 
+## Medallion analytics (Silver → Gold) + sample data
+
+The app writes operational Delta tables to the **`dbo`** schema of the Fabric
+Lakehouse (the **Bronze** layer). For reporting that combines learner activity
+with the **Eventhouse** news (RTI), two PySpark notebooks build a medallion:
+
+```
+Bronze (dbo: app tables + Eventhouse news)
+   └─▶ fabric/01_silver_conform.ipynb   → LH_LanguageApp_Silver
+        • types timestamps + date keys, standardizes language / CEFR
+        • de-dupes news, explodes dynamic arrays (topic_tags, verbs, vocabulary)
+          into tidy bridge tables, drops the embedding from the reporting copy
+   └─▶ fabric/02_gold_star.ipynb        → LH_LanguageApp_Gold (Direct Lake star)
+        • dims: dim_user, dim_date, dim_language, dim_cefr, dim_scenario, dim_news
+        • facts: fact_submission, fact_response, fact_exercise_score,
+                 fact_conversation, fact_news_engagement
+```
+
+The `conversations` table carries a nullable **`news_id`** so news-grounded chats
+join cleanly to `dim_news` — that's the hot-news ↔ warm-learner bridge. To wire the
+Eventhouse into Silver, create a **OneLake shortcut** to its `news_enriched` table
+in the Silver lakehouse (or set `news_onelake_path` / `eventhouse_query_uri` in the
+notebook parameters). Schedule **Silver → Gold** via a Fabric pipeline after news
+ingestion; both notebooks are idempotent (overwrite). The final Power BI relationships
+and example measures are documented in the Gold notebook's closing cell.
+
+### Sample data
+
+Populate every table with realistic, report-ready data (50 `Sample User N`,
+1k–5k rows per fact table, timestamps spread over the past month):
+
+```bash
+cd backend
+python ../scripts/seed_sample_data.py --dry-run   # validate against schemas, no writes
+python ../scripts/seed_sample_data.py             # seed the configured backend (dbo)
+```
+
+It writes **through the app's own data layer**, so rows always match the
+authoritative schema and land in the configured `ONELAKE_SCHEMA` (`dbo`). Sample
+users use the GUID prefix `5a3b1e00…` — remove them anytime with
+`… where user_id LIKE '5a3b1e00%'`. A companion migration adds + backfills the
+conversation `news_id` column on an existing lakehouse:
+`python ../scripts/migrate_add_conversation_news_id.py`.
+
 ## API endpoints
 
 | Method | Endpoint | Description |
@@ -347,13 +391,18 @@ backend/app/
 ├── models/        # Pydantic schemas
 └── config.py
 scripts/
-└── ingest_news.py        # GDELT → Foundry enrich → RTI store (--source sample|gdelt)
+├── ingest_news.py        # GDELT → Foundry enrich → RTI store (--source sample|gdelt)
+├── seed_sample_data.py   # Realistic sample data into the Lakehouse (dbo)
+└── migrate_add_conversation_news_id.py   # Add + backfill conversations.news_id
 frontend/src/
 ├── pages/         # Scenario, Verb practice, Conversation, Translate, History (+Progress)
 ├── components/    # Layout, reusable UI, worksheet renderer, InteractiveText, SpeakButton
 ├── auth/          # MSAL config, provider, token acquisition
 ├── services/      # API + WebSocket clients
 └── state/
+fabric/
+├── 01_silver_conform.ipynb   # Bronze → Silver (conform app + Eventhouse news)
+└── 02_gold_star.ipynb        # Silver → Gold (Direct Lake dims + facts)
 docs/
 ├── architecture.drawio   # Editable architecture diagram (draw.io, Fabric + Azure icons)
 └── architecture.svg      # Rendered diagram (self-contained, embedded in this README)

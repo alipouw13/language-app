@@ -312,8 +312,10 @@ def gen_exercise_scores(n: int, exercises: list[dict], lesson_index: dict,
     return rows
 
 
-def gen_conversations(n: int, user_ids: list[str], now: datetime, days: int):
+def gen_conversations(n: int, user_ids: list[str], now: datetime, days: int,
+                      news_ids: list[str] | None = None):
     convos, turns = [], []
+    news_ids = news_ids or []
     for _ in range(n):
         cid = str(uuid.uuid4())
         language = rng.choice(LANGUAGES)
@@ -321,16 +323,19 @@ def gen_conversations(n: int, user_ids: list[str], now: datetime, days: int):
         created = rand_dt(now, days)
         n_turns = rng.randint(4, 12)
         ended = created + timedelta(minutes=rng.randint(3, 30))
-        ctx = rng.choices(
-            [None, rng.choice(SCENARIOS),
-             "Current-events chat grounded in today's news."],
-            weights=[40, 45, 15],
-        )[0]
+        is_news = rng.random() < 0.15
+        if is_news:
+            ctx = "Current-events chat grounded in today's news."
+            news_id = rng.choice(news_ids) if news_ids else None
+        else:
+            ctx = rng.choices([None, rng.choice(SCENARIOS)], weights=[45, 55])[0]
+            news_id = None
         convos.append({
             "id": cid,
             "user_id": uid,
             "target_language": language,
             "scenario_context": ctx,
+            "news_id": news_id,
             "created_at": created.isoformat(),
             "ended_at": ended.isoformat(),
         })
@@ -376,13 +381,26 @@ async def main() -> None:
 
     now = datetime.now(timezone.utc)
 
+    # Pull real news_ids from the configured RTI store so a fraction of the
+    # seeded conversations can be grounded in actual news (for the Gold join).
+    news_ids: list[str] = []
+    try:
+        from app.repository import eventhouse
+        for lang in (s.news_languages or ["es", "fr", "en"]):
+            recent = await eventhouse.get_recent(lang, limit=100, max_age_hours=24 * 365)
+            news_ids.extend(r["news_id"] for r in recent if r.get("news_id"))
+        news_ids = list(dict.fromkeys(news_ids))
+    except Exception as exc:  # noqa: BLE001
+        print(f"  (warn) no RTI news available for grounding ({str(exc)[:80]})")
+    print(f"RTI news_ids available for conversation grounding: {len(news_ids)}")
+
     print("Generating rows…")
     users = gen_users(args.users, now, args.days)
     user_ids = [u["id"] for u in users]
     lessons, exercises, lesson_index = gen_lessons_and_exercises(args.lessons, user_ids, now, args.days)
     sub_headers, sub_details = gen_submissions(args.submissions, lesson_index, now, args.days)
     ex_scores = gen_exercise_scores(args.scores, exercises, lesson_index, now, args.days)
-    convos, turns = gen_conversations(args.conversations, user_ids, now, args.days)
+    convos, turns = gen_conversations(args.conversations, user_ids, now, args.days, news_ids)
 
     batches = {
         store.USERS: users,

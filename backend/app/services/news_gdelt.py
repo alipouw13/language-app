@@ -18,7 +18,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import httpx
 
@@ -226,6 +226,119 @@ _SAMPLE: dict[str, list[dict]] = {
 
 
 def sample_articles(language: str) -> list[dict]:
-    """Return a small fixed set of articles for offline dev/testing."""
+    """Return a small fixed set of articles for offline dev/testing.
+
+    Note: these have stable URLs, so re-ingesting them is a no-op once stored
+    (deduped by URL hash). Use :func:`synthetic_articles` to generate fresh,
+    unique articles on demand.
+    """
     now = datetime.now(timezone.utc).isoformat()
     return [{**a, "seen_at": now} for a in _SAMPLE.get(language, [])]
+
+
+# --------------------------------------------------------------------------- #
+# Synthetic source — fresh, varied articles with unique URLs every run.        #
+# Lets you populate the news store on demand without GDELT (no rate limits).   #
+# --------------------------------------------------------------------------- #
+import random  # noqa: E402  (kept local to the synthetic source)
+
+_SYN_META = {
+    "es": ("Spanish", "Spain", "es"),
+    "fr": ("French", "France", "fr"),
+    "en": ("English", "United States", "en"),
+}
+
+# (headline template, slug) pairs per language across varied topics. ``{x}`` is
+# filled from the matching subject pool so each run yields different combinations.
+_SYN_TEMPLATES: dict[str, list[tuple[str, str]]] = {
+    "es": [
+        ("La ciudad de {x} inaugura una nueva línea de tranvía eléctrico", "tranvia"),
+        ("Científicos de {x} desarrollan una batería que dura el doble", "bateria"),
+        ("El festival de cine de {x} bate récord de asistencia este año", "cine"),
+        ("Agricultores de {x} apuestan por el cultivo sostenible del olivo", "olivo"),
+        ("La selección de {x} se clasifica para la final del torneo", "futbol"),
+        ("Un nuevo museo de arte digital abre sus puertas en {x}", "museo"),
+        ("{x} reduce un 20% el uso de plástico en sus mercados", "plastico"),
+        ("Investigadores descubren restos romanos en el centro de {x}", "romanos"),
+        ("La cocina tradicional de {x} gana un premio internacional", "cocina"),
+        ("El turismo rural crece con fuerza en la región de {x}", "turismo"),
+    ],
+    "fr": [
+        ("La ville de {x} lance un réseau de vélos électriques partagés", "velos"),
+        ("Des chercheurs de {x} mettent au point un panneau solaire plus léger", "solaire"),
+        ("Le festival de musique de {x} attire un public record cette année", "festival"),
+        ("Les boulangers de {x} défendent la baguette artisanale", "baguette"),
+        ("L'équipe de {x} remporte le championnat après dix ans", "championnat"),
+        ("Un nouveau parc naturel ouvre près de {x}", "parc"),
+        ("{x} inaugure une ligne de train à grande vitesse vers le sud", "tgv"),
+        ("Des archéologues révèlent une mosaïque gauloise à {x}", "mosaique"),
+        ("La gastronomie de {x} séduit les critiques internationaux", "gastronomie"),
+        ("Le tourisme à vélo se développe dans la région de {x}", "tourisme"),
+    ],
+    "en": [
+        ("The city of {x} opens a new electric ferry route", "ferry"),
+        ("Researchers in {x} build a cheaper way to recycle batteries", "battery"),
+        ("The {x} film festival draws record crowds this year", "film"),
+        ("Local farmers near {x} switch to regenerative agriculture", "farming"),
+        ("The {x} team wins the league after a decade", "league"),
+        ("A new science museum opens its doors in {x}", "museum"),
+        ("{x} cuts single-use plastic in its markets by a fifth", "plastic"),
+        ("Archaeologists uncover a medieval street under {x}", "dig"),
+        ("Street food from {x} wins an international award", "food"),
+        ("Cycling tourism is booming in the {x} region", "cycling"),
+    ],
+}
+
+_SYN_SUBJECTS: dict[str, list[str]] = {
+    "es": ["Valencia", "Sevilla", "Bilbao", "Granada", "Málaga", "Zaragoza",
+           "Salamanca", "Córdoba", "Toledo", "Santander", "Murcia", "Gijón"],
+    "fr": ["Lyon", "Marseille", "Bordeaux", "Lille", "Nantes", "Strasbourg",
+           "Toulouse", "Rennes", "Nice", "Dijon", "Grenoble", "Reims"],
+    "en": ["Portland", "Austin", "Denver", "Seattle", "Bristol", "Leeds",
+           "Calgary", "Dublin", "Boulder", "Madison", "Tucson", "Raleigh"],
+}
+
+_SYN_DOMAINS = ["noticiaslocales.example", "diarioregional.example", "lejournal.example",
+                "citytimes.example", "actualites.example", "newsdaily.example"]
+
+
+def synthetic_articles(language: str, count: int = 8) -> list[dict]:
+    """Generate ``count`` fresh, unique synthetic articles for a language.
+
+    Headlines are random template/subject combinations and every URL carries a
+    timestamp + random token, so the articles are always *new* (pass dedup) and
+    flow through the full enrichment + ingestion pipeline — ideal for demos and
+    populating the store without hitting GDELT.
+    """
+    lang = language if language in _SYN_TEMPLATES else "en"
+    lang_name, country, code = _SYN_META[lang]
+    templates = _SYN_TEMPLATES[lang]
+    subjects = _SYN_SUBJECTS[lang]
+    now_dt = datetime.now(timezone.utc)
+    stamp = now_dt.strftime("%Y%m%d%H%M%S")
+
+    out: list[dict] = []
+    chosen = random.sample(templates, k=min(count, len(templates)))
+    # If more than the template count is requested, allow repeats with new subjects.
+    while len(chosen) < count:
+        chosen.append(random.choice(templates))
+
+    for i, (template, slug) in enumerate(chosen):
+        subject = random.choice(subjects)
+        token = f"{random.randint(100000, 999999):06d}"
+        domain = random.choice(_SYN_DOMAINS)
+        title = template.format(x=subject)
+        # Unique URL every run → always counts as a "new" article.
+        url = f"https://{domain}/{code}/{slug}-{subject.lower()}-{stamp}-{token}"
+        # Spread timestamps over the last few hours for realistic recency.
+        seen = (now_dt - timedelta(minutes=15 * i)).isoformat()
+        out.append({
+            "url": url,
+            "title": title,
+            "domain": domain,
+            "language": lang_name,
+            "source_country": country,
+            "social_image": "",
+            "seen_at": seen,
+        })
+    return out

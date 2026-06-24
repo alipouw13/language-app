@@ -67,7 +67,12 @@ class LakehouseClient:
     def _table_uri(self, table: str) -> str:
         if self._backend == "local":
             return os.path.join(self._settings.local_lakehouse_path, table)
-        return f"{self._settings.onelake_tables_uri}/{table}"
+        # Schema-enabled lakehouses nest tables under Tables/<schema>/<name>.
+        schema = (self._settings.onelake_schema or "").strip().strip("/")
+        prefix = self._settings.onelake_tables_uri
+        if schema:
+            return f"{prefix}/{schema}/{table}"
+        return f"{prefix}/{table}"
 
     def _storage_options(self) -> dict[str, str] | None:
         if self._backend == "local":
@@ -129,6 +134,27 @@ class LakehouseClient:
             storage_options=self._storage_options(),
         )
 
+    def _create_empty(self, table: str, schema: pa.Schema) -> bool:
+        """Create an empty Delta table with *schema* if it doesn't exist.
+
+        Returns True if the table was created, False if it already existed.
+        delta-rs cannot write a zero-row batch, so we use DeltaTable.create
+        (mode='ignore' makes it idempotent).
+        """
+        if self._exists(table):
+            return False
+        uri = self._table_uri(table)
+        if self._backend == "local":
+            os.makedirs(uri, exist_ok=True)
+        DeltaTable.create(
+            uri,
+            schema,
+            mode="ignore",
+            name=table,
+            storage_options=self._storage_options(),
+        )
+        return True
+
     # ------------------------------------------------------------------ #
     # Async public API                                                   #
     # ------------------------------------------------------------------ #
@@ -149,6 +175,14 @@ class LakehouseClient:
     ) -> None:
         async with self._locks[table]:
             await asyncio.to_thread(self._write, table, rows, schema, "overwrite")
+
+    async def create_table(self, table: str, schema: pa.Schema) -> bool:
+        """Create an empty Delta table with *schema* if it doesn't exist.
+
+        Returns True if it was created, False if it already existed.
+        """
+        async with self._locks[table]:
+            return await asyncio.to_thread(self._create_empty, table, schema)
 
     async def read_modify_write(
         self,

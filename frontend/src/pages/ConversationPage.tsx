@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import type { LangCode } from '../constants';
-import { LANGUAGES } from '../constants';
+import type { LangCode, Level } from '../constants';
+import { LANGUAGES, LEVELS } from '../constants';
 import { useConversationStore } from '../state/useConversationStore';
-import { authHeader, speakText } from '../services/api';
+import { authHeader, getNewsTopics, speakText } from '../services/api';
+import type { NewsTopic } from '../types';
 import InteractiveText from '../components/InteractiveText';
 import SpeakButton from '../components/SpeakButton';
-import { Alert, Button, Card, Field, LanguageBadge, Select, TextInput } from '../components/ui';
+import { Alert, Badge, Button, Card, Field, LanguageBadge, Select, TextInput } from '../components/ui';
 
 export default function ConversationPage() {
   const { conversationId, turns, loading, error, start, send, reset } =
@@ -17,6 +18,14 @@ export default function ConversationPage() {
   const [autoSpeak, setAutoSpeak] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const lastSpokenRef = useRef(-1);
+
+  // Current events (Real-Time Intelligence) topic picker.
+  const [newsLevel, setNewsLevel] = useState<Level>('B1');
+  const [personalized, setPersonalized] = useState(false);
+  const [newsTopics, setNewsTopics] = useState<NewsTopic[]>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
+  const [newsError, setNewsError] = useState<string | null>(null);
+  const [newsLoaded, setNewsLoaded] = useState(false);
 
   const [isRecording, setIsRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -56,6 +65,21 @@ export default function ConversationPage() {
     const text = input;
     setInput('');
     await send(text);
+  };
+
+  const loadNews = async () => {
+    setNewsLoading(true);
+    setNewsError(null);
+    try {
+      const res = await getNewsTopics(language, newsLevel, personalized);
+      setNewsTopics(res.items);
+      setNewsLoaded(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load news';
+      setNewsError(msg);
+    } finally {
+      setNewsLoading(false);
+    }
   };
 
   const startRecording = async () => {
@@ -153,6 +177,78 @@ export default function ConversationPage() {
             </Button>
           </div>
           {error && <Alert>{error}</Alert>}
+        </Card>
+
+        <Card>
+          <header className="page-head">
+            <h2>📰 Current events</h2>
+            <p className="muted">
+              Practice with real, fresh news in your target language. Pick a headline to start
+              a conversation grounded in today's events.
+            </p>
+          </header>
+          <div className="row" style={{ gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <Field label="Reading level" htmlFor="newslevel">
+              <Select
+                id="newslevel"
+                value={newsLevel}
+                onChange={(e) => setNewsLevel(e.target.value as Level)}
+              >
+                {LEVELS.map((lvl) => (
+                  <option key={lvl} value={lvl}>
+                    {lvl}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <label className="autospeak-toggle" title="Rank news toward skills you find hard">
+              <input
+                type="checkbox"
+                checked={personalized}
+                onChange={(e) => setPersonalized(e.target.checked)}
+              />
+              Personalize to my weak spots
+            </label>
+            <Button variant="ghost" onClick={loadNews} disabled={newsLoading}>
+              {newsLoading ? 'Loading…' : "Load today's news"}
+            </Button>
+          </div>
+
+          {newsError && <Alert>{newsError}</Alert>}
+
+          {newsLoaded && !newsLoading && newsTopics.length === 0 && !newsError && (
+            <p className="muted">
+              No fresh news found for {LANGUAGES.find((l) => l.code === language)?.label}. Run the
+              ingestion script (<code>python scripts/ingest_news.py</code>) to populate the
+              Eventhouse, then try again.
+            </p>
+          )}
+
+          <div className="news-list">
+            {newsTopics.map((topic) => (
+              <div key={topic.news_id} className="news-card">
+                <div className="news-card-body">
+                  <div className="row" style={{ gap: '0.5rem', alignItems: 'center' }}>
+                    {topic.cefr_level && <Badge>{topic.cefr_level}</Badge>}
+                    {topic.topic_tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="chip">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3>{topic.title}</h3>
+                  {topic.english_gloss && <p className="muted">{topic.english_gloss}</p>}
+                  {topic.domain && <p className="news-source">{topic.domain}</p>}
+                </div>
+                <Button
+                  onClick={() => start(language, undefined, topic.news_id)}
+                  disabled={loading}
+                >
+                  Discuss this
+                </Button>
+              </div>
+            ))}
+          </div>
         </Card>
       </div>
     );

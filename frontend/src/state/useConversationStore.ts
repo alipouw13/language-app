@@ -17,18 +17,21 @@ export function useConversationStore() {
     error: null,
   });
 
-  const start = useCallback(async (language: string, scenario?: string) => {
-    setState((s) => ({ ...s, loading: true, error: null, turns: [] }));
-    try {
-      const res = await startConversation(language, scenario);
-      setState((s) => ({ ...s, conversationId: res.id, loading: false }));
-      return res.id;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to start conversation';
-      setState((s) => ({ ...s, loading: false, error: msg }));
-      return null;
-    }
-  }, []);
+  const start = useCallback(
+    async (language: string, scenario?: string, newsId?: string) => {
+      setState((s) => ({ ...s, loading: true, error: null, turns: [] }));
+      try {
+        const res = await startConversation(language, scenario, newsId);
+        setState((s) => ({ ...s, conversationId: res.id, loading: false }));
+        return res.id;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Failed to start conversation';
+        setState((s) => ({ ...s, loading: false, error: msg }));
+        return null;
+      }
+    },
+    [],
+  );
 
   const send = useCallback(async (text: string) => {
     if (!state.conversationId) return;

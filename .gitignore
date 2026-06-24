@@ -48,6 +48,10 @@ data/
 .lakehouse/
 backend/.lakehouse/
 
+# Local Real-Time Intelligence (news) store for dev
+.rti/
+backend/.rti/
+
 # IDE and editor files
 .idea/
 .vscode/

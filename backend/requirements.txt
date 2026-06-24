@@ -26,5 +26,11 @@ python-dotenv>=1.0.0
 # WebSockets (included with uvicorn[standard])
 websockets>=12.0
 
-# HTTP client (JWKS fetch, Translator REST fallback)
+# HTTP client (JWKS fetch, Translator REST fallback, GDELT news source)
 httpx>=0.26.0
+
+# Real-Time Intelligence: Fabric Eventhouse (KQL) ingest + query.
+# Only needed when RTI_BACKEND=eventhouse — imported lazily, so local dev
+# (RTI_BACKEND=local) runs without these installed.
+azure-kusto-data>=6.0.0
+azure-kusto-ingest>=6.0.0

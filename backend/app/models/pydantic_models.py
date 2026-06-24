@@ -145,6 +145,10 @@ class TTSRequest(BaseModel):
 class ConversationStartRequest(BaseModel):
     target_language: str = Field(..., pattern=LANG_PATTERN)
     scenario_context: str | None = None
+    news_id: str | None = Field(
+        default=None,
+        description="Optional enriched-news item to ground the conversation in current events.",
+    )
 
 
 class ConversationMessageRequest(BaseModel):

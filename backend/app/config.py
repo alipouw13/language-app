@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     onelake_lakehouse: str = ""
     # OneLake DFS host (rarely changes).
     onelake_host: str = "onelake.dfs.fabric.microsoft.com"
+    # Lakehouse schema. Schema-enabled lakehouses store tables under
+    # Tables/<schema>/<name> (default schema is "dbo") and only surface those in
+    # the UI. Leave empty for a classic (non-schema) lakehouse.
+    onelake_schema: str = ""
 
     # --- Azure OpenAI (chat / evaluation — Entra authentication) ---
     azure_openai_endpoint: str = ""
@@ -59,6 +63,47 @@ class Settings(BaseSettings):
     # Dedicated translation model deployment (optional). When empty the
     # main chat deployment is used as a fallback.
     azure_translation_model_name: str = ""
+
+    # Embedding deployment (optional) used to vectorize news for semantic
+    # retrieval. When empty, news retrieval falls back to recency + level only.
+    azure_openai_embedding_deployment: str = ""
+
+    # ------------------------------------------------------------------ #
+    # Real-Time Intelligence — news stream (Fabric Eventhouse / KQL)     #
+    # ------------------------------------------------------------------ #
+    # "local"      → enriched news stored on disk (dev / tests, no Fabric)
+    # "eventhouse" → enriched news ingested into a Fabric Eventhouse (KQL DB)
+    rti_backend: str = "local"
+    local_rti_path: str = "./.rti"
+
+    # Fabric Eventhouse (KQL database) — required when rti_backend="eventhouse".
+    # The query and ingest URIs come from the Eventhouse "Cluster URI" (https://
+    # <cluster>.kusto.fabric.microsoft.com); ingest URI is usually the same host.
+    eventhouse_query_uri: str = ""
+    eventhouse_ingest_uri: str = ""
+    eventhouse_database: str = ""
+    # KQL table that holds enriched news records.
+    eventhouse_news_table: str = "news_enriched"
+
+    # --- GDELT news source ---
+    # Languages to ingest current-events news for (subset of en/fr/es).
+    news_languages: list[str] = ["es", "fr"]
+    # How far back GDELT looks per poll, and the cap on articles per language.
+    gdelt_timespan: str = "1d"
+    gdelt_max_records: int = 40
+    # Optional per-language GDELT query override (empty → built-in defaults).
+    gdelt_query_es: str = ""
+    gdelt_query_fr: str = ""
+    gdelt_query_en: str = ""
+
+    # CEFR level assumed for a learner when none is known (affects grading).
+    news_default_level: str = "B1"
+    # Discard enriched news older than this many hours when serving topics.
+    news_max_age_hours: int = 48
+
+    # Background poller: when enabled the API ingests news on a timer.
+    news_poll_enabled: bool = False
+    news_poll_interval_minutes: int = 60
 
     # ------------------------------------------------------------------ #
     # API authentication — Microsoft Entra ID                            #

@@ -807,6 +807,55 @@ textarea.control {
   accent-color: var(--primary);
 }
 
+/* ------------------------------------------------------------------ Current events */
+.row {
+  display: flex;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.news-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.news-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.news-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.news-card-body h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+.news-card-body p {
+  margin: 0;
+}
+.news-source {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 /* ------------------------------------------------------------------ Responsive */
 @media (max-width: 760px) {
   .appbar {

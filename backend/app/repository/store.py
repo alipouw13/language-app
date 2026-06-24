@@ -12,6 +12,7 @@ Tables (Delta):
 from __future__ import annotations
 
 import json
+import logging
 import uuid
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
@@ -19,6 +20,8 @@ from typing import Any
 import pyarrow as pa
 
 from app.repository.lakehouse import get_lakehouse
+
+logger = logging.getLogger(__name__)
 
 # --------------------------------------------------------------------------- #
 # Schemas                                                                      #
@@ -80,6 +83,7 @@ _SCHEMAS: dict[str, pa.Schema] = {
         ("user_id", pa.string()),
         ("target_language", pa.string()),
         ("scenario_context", pa.string()),  # nullable
+        ("news_id", pa.string()),           # nullable — RTI news item this chat is grounded in
         ("created_at", pa.string()),
         ("ended_at", pa.string()),          # nullable
     ]),
@@ -177,6 +181,67 @@ def _coerce(row: dict[str, Any], schema: pa.Schema) -> dict[str, Any]:
 async def ensure_ready() -> dict[str, Any]:
     """Verify the lakehouse backend is reachable (called at startup)."""
     return await get_lakehouse().health_check()
+
+
+async def table_status() -> list[dict[str, Any]]:
+    """Per-table existence + row count, for confirming the lakehouse state."""
+    lake = get_lakehouse()
+    status: list[dict[str, Any]] = []
+    for table, schema in _SCHEMAS.items():
+        try:
+            rows = await lake.read_all(table, schema)
+            status.append({"table": table, "exists": True, "rows": len(rows)})
+        except Exception as exc:  # noqa: BLE001
+            status.append(
+                {"table": table, "exists": False, "rows": 0, "error": str(exc)[:200]}
+            )
+    return status
+
+
+async def ensure_tables() -> dict[str, list[str]]:
+    """Create every Delta table (empty, with schema) if it doesn't yet exist.
+
+    Called at startup so the lakehouse shows all tables immediately — before any
+    worksheet is generated or submitted — ready to be populated. Idempotent.
+    The calendar dimension is also seeded so date-based Power BI models work.
+    """
+    lake = get_lakehouse()
+    created: list[str] = []
+    existed: list[str] = []
+    failed: list[str] = []
+    last_error: str | None = None
+    for table, schema in _SCHEMAS.items():
+        try:
+            was_created = await lake.create_table(table, schema)
+            (created if was_created else existed).append(table)
+        except Exception as exc:  # noqa: BLE001
+            failed.append(table)
+            last_error = str(exc)
+            logger.warning("Could not ensure table %s: %s", table, str(exc)[:200])
+
+    if failed and not created and not existed:
+        # Every table failed — almost always a storage-connectivity problem.
+        logger.error(
+            "Could not provision ANY lakehouse tables — the storage backend looks "
+            "unreachable. Last error: %s",
+            (last_error or "")[:300],
+        )
+        return {"created": created, "existed": existed, "failed": failed}
+
+    # Seed the calendar dimension if it's empty (it was just created).
+    try:
+        await ensure_date_dim()
+    except Exception:
+        logger.exception("Failed to seed date_dim")
+
+    if created:
+        logger.info("Created lakehouse tables: %s", ", ".join(created))
+    logger.info(
+        "Lakehouse tables ready (%d ok, %d failed)",
+        len(created) + len(existed),
+        len(failed),
+    )
+    return {"created": created, "existed": existed, "failed": failed}
 
 
 # --------------------------------------------------------------------------- #
@@ -370,7 +435,8 @@ async def record_exercise_score(
 # Conversations + turns                                                        #
 # --------------------------------------------------------------------------- #
 async def create_conversation(
-    *, user_id: str, target_language: str, scenario_context: str | None
+    *, user_id: str, target_language: str, scenario_context: str | None,
+    news_id: str | None = None,
 ) -> dict[str, Any]:
     lake = get_lakehouse()
     conv = _coerce(
@@ -379,6 +445,7 @@ async def create_conversation(
             "user_id": user_id,
             "target_language": target_language,
             "scenario_context": scenario_context,
+            "news_id": news_id,
             "created_at": _now(),
             "ended_at": None,
         },

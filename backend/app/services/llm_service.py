@@ -184,6 +184,23 @@ async def chat_completion_json(
     return parse_json(raw)
 
 
+async def embed_text(text: str) -> list[float] | None:
+    """Embed text with the configured embedding deployment.
+
+    Returns ``None`` when ``AZURE_OPENAI_EMBEDDING_DEPLOYMENT`` is not set, so
+    callers transparently fall back to non-semantic retrieval.
+    """
+    s = get_settings()
+    deployment = s.azure_openai_embedding_deployment
+    if not deployment:
+        return None
+    cleaned = (text or "").replace("\n", " ").strip()
+    if not cleaned:
+        return None
+    resp = await _get_client().embeddings.create(model=deployment, input=cleaned)
+    return list(resp.data[0].embedding)
+
+
 def parse_json(raw: str) -> dict[str, Any]:
     """Parse model output as JSON, tolerating markdown code fences."""
     try:

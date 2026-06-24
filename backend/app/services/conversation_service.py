@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from app.models.pydantic_models import ConversationStartRequest
 from app.repository import store
+from app.services import news_service
 from app.services.llm_service import chat_completion
 
 LANGUAGE_NAMES = {"en": "English", "fr": "French", "es": "Spanish"}
@@ -33,10 +34,17 @@ def _build_system_prompt(language: str, scenario: str | None) -> str:
 async def start_conversation(
     req: ConversationStartRequest, user_id: str
 ) -> dict:
+    scenario = req.scenario_context
+    if req.news_id:
+        # Ground the session in a real, current news item (RAG over the RTI hot path).
+        scenario = await news_service.build_conversation_context(
+            req.news_id, fallback=req.scenario_context
+        )
     return await store.create_conversation(
         user_id=user_id,
         target_language=req.target_language,
-        scenario_context=req.scenario_context,
+        scenario_context=scenario,
+        news_id=req.news_id,
     )
 
 

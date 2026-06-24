@@ -161,6 +161,34 @@ export interface ConversationTurn {
   turn_index: number;
 }
 
+export interface NewsVocabularyItem {
+  word: string;
+  translation: string;
+}
+
+export interface NewsTopic {
+  news_id: string;
+  title: string;
+  summary: string | null;
+  english_gloss: string | null;
+  cefr_level: string | null;
+  topic_tags: string[];
+  verbs: string[];
+  vocabulary: NewsVocabularyItem[];
+  conversation_starters: string[];
+  domain: string | null;
+  url: string | null;
+  language: string;
+  seen_at: string | null;
+}
+
+export interface NewsTopicsResponse {
+  items: NewsTopic[];
+  language: string;
+  level: string | null;
+  count: number;
+}
+
 export interface ConversationDetail {
   id: string;
   target_language: string;

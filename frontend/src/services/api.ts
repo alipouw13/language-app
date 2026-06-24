@@ -7,6 +7,8 @@ import type {
   LessonDetail,
   LessonResponse,
   LessonSummary,
+  NewsTopic,
+  NewsTopicsResponse,
   PaginatedResponse,
   SubmissionDetail,
   SubmissionSummary,
@@ -154,10 +156,12 @@ export async function translateText(
 export async function startConversation(
   targetLanguage: string,
   scenarioContext?: string,
+  newsId?: string,
 ): Promise<{ id: string; target_language: string; scenario_context: string | null }> {
   const { data } = await api.post('/conversations', {
     target_language: targetLanguage,
     scenario_context: scenarioContext,
+    news_id: newsId,
   });
   return data;
 }
@@ -172,6 +176,25 @@ export async function sendMessage(
 
 export async function getConversation(conversationId: string): Promise<ConversationDetail> {
   const { data } = await api.get(`/conversations/${conversationId}`);
+  return data;
+}
+
+// --- Current events (Real-Time Intelligence news) ---
+
+export async function getNewsTopics(
+  lang: string,
+  level?: string,
+  personalized = false,
+  limit = 12,
+): Promise<NewsTopicsResponse> {
+  const { data } = await api.get('/news/topics', {
+    params: { lang, level, personalized, limit },
+  });
+  return data;
+}
+
+export async function getNewsTopic(newsId: string): Promise<NewsTopic> {
+  const { data } = await api.get(`/news/${newsId}`);
   return data;
 }
 

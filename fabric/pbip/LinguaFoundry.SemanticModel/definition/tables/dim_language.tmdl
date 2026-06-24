@@ -1,0 +1,19 @@
+table dim_language
+
+	column language_code
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: language_code
+
+	column Language
+		dataType: string
+		summarizeBy: none
+		sourceColumn: language_name
+
+	partition dim_language = entity
+		mode: directLake
+		source
+			entityName: dim_language
+			schemaName: dbo
+			expressionSource: DirectLake

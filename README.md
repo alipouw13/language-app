@@ -354,6 +354,34 @@ notebook parameters). Schedule **Silver → Gold** via a Fabric pipeline after n
 ingestion; both notebooks are idempotent (overwrite). The final Power BI relationships
 and example measures are documented in the Gold notebook's closing cell.
 
+> All three lakehouses are **schema-enabled** (`dbo`), so the notebooks read/write under
+> `Tables/dbo/…`. The Silver and Gold lakehouse names + `dbo` schema in the parameter cells
+> are all the notebooks need — **you do not have to "attach" lakehouses** to the notebooks,
+> because every read/write uses a fully-qualified OneLake `abfss://` path. (Attaching only
+> adds the Lakehouse explorer and lets you use relative `Tables/` paths or `spark.sql`.) The
+> one value that must be exact is the `workspace` parameter — its name or GUID.
+
+### Starter Power BI report (PBIP)
+
+`fabric/pbip/LinguaFoundry.pbip` is a ready-to-open **Power BI Project** (TMDL, git-friendly)
+with a **Direct Lake** semantic model over `LH_LanguageApp_Gold` — 11 tables, 18 relationships,
+and 20 measures (submissions, accuracy/improvement, conversations, **News-Grounded %**, etc.).
+It was authored with the Fabric **`semantic-model-authoring`** skill (from the
+[skills-for-fabric](https://github.com/microsoft/skills-for-fabric) Copilot plugin).
+
+To use it:
+
+1. Run the Silver + Gold notebooks first so `LH_LanguageApp_Gold` has data.
+2. Open `fabric/pbip/LinguaFoundry.pbip` in **Power BI Desktop** (Preview: enable *Power BI
+   Project (.pbip)* files). The model binds to the Gold lakehouse via a Direct Lake named
+   expression (`expressions.tmdl`) using the workspace + lakehouse GUIDs.
+3. On first open, confirm the OneLake connection if prompted, then build visuals on the blank
+   **Overview** page and publish to the **Language App** workspace.
+
+> The Direct Lake expression points at the workspace/lakehouse GUIDs resolved for this repo
+> (`Language App` / `LH_LanguageApp_Gold`). If you clone into a different workspace, update the
+> two GUIDs in `LinguaFoundry.SemanticModel/definition/expressions.tmdl`.
+
 ### Sample data
 
 Populate every table with realistic, report-ready data (50 `Sample User N`,
@@ -418,7 +446,9 @@ frontend/src/
 └── state/
 fabric/
 ├── 01_silver_conform.ipynb   # Bronze → Silver (conform app + Eventhouse news)
-└── 02_gold_star.ipynb        # Silver → Gold (Direct Lake dims + facts)
+├── 02_gold_star.ipynb        # Silver → Gold (Direct Lake dims + facts)
+└── pbip/                     # Starter Power BI Project (Direct Lake on Gold)
+    └── LinguaFoundry.pbip    #   open in Power BI Desktop; semantic model + report
 docs/
 ├── architecture.drawio   # Editable architecture diagram (draw.io, Fabric + Azure icons)
 └── architecture.svg      # Rendered diagram (self-contained, embedded in this README)

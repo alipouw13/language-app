@@ -1,0 +1,52 @@
+table fact_exercise_score
+
+	/// Number of standalone answer checks.
+	measure Checks = COUNTROWS(fact_exercise_score)
+		formatString: #,##0
+
+	/// Average score of standalone checks.
+	measure 'Avg Check Score' = AVERAGE(fact_exercise_score[score])
+		formatString: 0.0%
+
+	column id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: id
+
+	column exercise_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: exercise_id
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column score
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: score
+
+	column is_correct
+		dataType: boolean
+		isHidden
+		summarizeBy: none
+		sourceColumn: is_correct
+
+	partition fact_exercise_score = entity
+		mode: directLake
+		source
+			entityName: fact_exercise_score
+			schemaName: dbo
+			expressionSource: DirectLake

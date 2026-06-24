@@ -1,0 +1,24 @@
+table dim_scenario
+
+	column scenario_key
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: scenario_key
+
+	column Scenario
+		dataType: string
+		summarizeBy: none
+		sourceColumn: scenario_name
+
+	column Mode
+		dataType: string
+		summarizeBy: none
+		sourceColumn: mode
+
+	partition dim_scenario = entity
+		mode: directLake
+		source
+			entityName: dim_scenario
+			schemaName: dbo
+			expressionSource: DirectLake

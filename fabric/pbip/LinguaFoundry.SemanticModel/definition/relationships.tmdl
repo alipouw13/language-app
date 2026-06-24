@@ -1,0 +1,71 @@
+relationship rel_01_fact_submission_dim_user
+	fromColumn: fact_submission.user_id
+	toColumn: dim_user.user_id
+
+relationship rel_02_fact_submission_dim_date
+	fromColumn: fact_submission.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_03_fact_response_dim_user
+	fromColumn: fact_response.user_id
+	toColumn: dim_user.user_id
+
+relationship rel_04_fact_response_dim_date
+	fromColumn: fact_response.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_05_fact_exercise_score_dim_user
+	fromColumn: fact_exercise_score.user_id
+	toColumn: dim_user.user_id
+
+relationship rel_06_fact_exercise_score_dim_date
+	fromColumn: fact_exercise_score.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_07_fact_conversation_dim_user
+	fromColumn: fact_conversation.user_id
+	toColumn: dim_user.user_id
+
+relationship rel_08_fact_conversation_dim_date
+	fromColumn: fact_conversation.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_09_fact_news_engagement_dim_user
+	fromColumn: fact_news_engagement.user_id
+	toColumn: dim_user.user_id
+
+relationship rel_10_fact_news_engagement_dim_date
+	fromColumn: fact_news_engagement.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_11_fact_submission_dim_language
+	fromColumn: fact_submission.language_code
+	toColumn: dim_language.language_code
+
+relationship rel_12_fact_response_dim_language
+	fromColumn: fact_response.language_code
+	toColumn: dim_language.language_code
+
+relationship rel_13_fact_conversation_dim_language
+	fromColumn: fact_conversation.language_code
+	toColumn: dim_language.language_code
+
+relationship rel_14_fact_submission_dim_cefr
+	fromColumn: fact_submission.cefr_level
+	toColumn: dim_cefr.'CEFR Level'
+
+relationship rel_15_fact_response_dim_cefr
+	fromColumn: fact_response.cefr_level
+	toColumn: dim_cefr.'CEFR Level'
+
+relationship rel_16_fact_submission_dim_scenario
+	fromColumn: fact_submission.scenario_key
+	toColumn: dim_scenario.scenario_key
+
+relationship rel_17_fact_conversation_dim_news
+	fromColumn: fact_conversation.news_id
+	toColumn: dim_news.news_id
+
+relationship rel_18_fact_news_engagement_dim_news
+	fromColumn: fact_news_engagement.news_id
+	toColumn: dim_news.news_id

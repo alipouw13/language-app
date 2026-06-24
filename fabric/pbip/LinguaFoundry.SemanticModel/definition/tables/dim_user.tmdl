@@ -1,0 +1,39 @@
+table dim_user
+
+	/// Distinct learners in context.
+	measure Learners = DISTINCTCOUNT(dim_user[user_id])
+		formatString: #,##0
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column 'User Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: user_name
+
+	column 'Native Language'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: native_language
+
+	column created_date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: created_date_key
+
+	column 'Is Sample'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_sample
+
+	partition dim_user = entity
+		mode: directLake
+		source
+			entityName: dim_user
+			schemaName: dbo
+			expressionSource: DirectLake

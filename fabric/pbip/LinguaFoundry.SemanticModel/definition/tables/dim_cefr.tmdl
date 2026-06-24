@@ -1,0 +1,20 @@
+table dim_cefr
+
+	column 'CEFR Level'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: cefr_level
+		sortByColumn: 'CEFR Order'
+
+	column 'CEFR Order'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: cefr_order
+
+	partition dim_cefr = entity
+		mode: directLake
+		source
+			entityName: dim_cefr
+			schemaName: dbo
+			expressionSource: DirectLake

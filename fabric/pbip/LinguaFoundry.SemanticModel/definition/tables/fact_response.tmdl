@@ -1,0 +1,97 @@
+table fact_response
+
+	/// Number of exercise responses.
+	measure Responses = COUNTROWS(fact_response)
+		formatString: #,##0
+
+	/// Average attempts per response.
+	measure 'Avg Attempts' = AVERAGE(fact_response[attempts])
+		formatString: 0.0
+
+	/// Share of responses correct on first attempt.
+	measure 'First-Correct %' = DIVIDE(CALCULATE(COUNTROWS(fact_response), fact_response[first_is_correct] = TRUE()), COUNTROWS(fact_response))
+		formatString: 0.0%
+
+	column response_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: response_id
+
+	column submission_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: submission_id
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column exercise_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: exercise_id
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column language_code
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: language_code
+
+	column cefr_level
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: cefr_level
+
+	column 'Exercise Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: exercise_type
+
+	column first_score
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: first_score
+
+	column first_is_correct
+		dataType: boolean
+		isHidden
+		summarizeBy: none
+		sourceColumn: first_is_correct
+
+	column final_score
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: final_score
+
+	column final_is_correct
+		dataType: boolean
+		isHidden
+		summarizeBy: none
+		sourceColumn: final_is_correct
+
+	column attempts
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: attempts
+
+	partition fact_response = entity
+		mode: directLake
+		source
+			entityName: fact_response
+			schemaName: dbo
+			expressionSource: DirectLake

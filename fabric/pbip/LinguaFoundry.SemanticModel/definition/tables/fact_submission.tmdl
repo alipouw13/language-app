@@ -1,0 +1,154 @@
+table fact_submission
+
+	/// Number of submitted worksheets.
+	measure Submissions = COUNTROWS(fact_submission)
+		formatString: #,##0
+
+	/// Average first-attempt score across submissions.
+	measure 'Avg First Score' = AVERAGE(fact_submission[first_score_avg])
+		formatString: 0.0%
+
+	/// Average corrected score across submissions.
+	measure 'Avg Final Score' = AVERAGE(fact_submission[final_score_avg])
+		formatString: 0.0%
+
+	/// Average lift from first to final score.
+	measure 'Avg Improvement' = AVERAGE(fact_submission[improvement])
+		formatString: 0.0%
+
+	/// Share of answered exercises correct on first try.
+	measure 'First-Try Accuracy' = AVERAGE(fact_submission[accuracy_first])
+		formatString: 0.0%
+
+	/// Share of answered exercises correct after correction.
+	measure 'Final Accuracy' = AVERAGE(fact_submission[accuracy_final])
+		formatString: 0.0%
+
+	/// Total exercises across submissions.
+	measure 'Total Exercises' = SUM(fact_submission[total_exercises])
+		formatString: #,##0
+
+	column submission_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: submission_id
+
+	column lesson_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: lesson_id
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column language_code
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: language_code
+
+	column cefr_level
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: cefr_level
+
+	column scenario_key
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: scenario_key
+
+	column mode
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: mode
+
+	column Verb
+		dataType: string
+		summarizeBy: none
+		sourceColumn: verb
+
+	column 'Grammar Focus'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: grammar_focus
+
+	column total_exercises
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: total_exercises
+
+	column answered_count
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: answered_count
+
+	column first_correct_count
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: first_correct_count
+
+	column final_correct_count
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: final_correct_count
+
+	column first_score_avg
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: first_score_avg
+
+	column final_score_avg
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: final_score_avg
+
+	column improvement
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: improvement
+
+	column accuracy_first
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: accuracy_first
+
+	column accuracy_final
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: accuracy_final
+
+	column submitted_ts
+		dataType: dateTime
+		isHidden
+		summarizeBy: none
+		sourceColumn: submitted_ts
+
+	partition fact_submission = entity
+		mode: directLake
+		source
+			entityName: fact_submission
+			schemaName: dbo
+			expressionSource: DirectLake

@@ -1,0 +1,88 @@
+table fact_conversation
+
+	/// Number of conversation sessions.
+	measure Conversations = COUNTROWS(fact_conversation)
+		formatString: #,##0
+
+	/// Average turns per conversation.
+	measure 'Avg Turns' = AVERAGE(fact_conversation[turn_count])
+		formatString: 0.0
+
+	/// Average conversation duration in minutes.
+	measure 'Avg Minutes' = AVERAGE(fact_conversation[duration_min])
+		formatString: 0.0
+
+	/// Conversations grounded in a real news item.
+	measure 'News-Grounded Chats' = CALCULATE(COUNTROWS(fact_conversation), fact_conversation[is_news_grounded] = TRUE())
+		formatString: #,##0
+
+	/// Share of conversations grounded in news.
+	measure 'News-Grounded %' = DIVIDE([News-Grounded Chats], [Conversations])
+		formatString: 0.0%
+
+	column id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: id
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column language_code
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: language_code
+
+	column news_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: news_id
+
+	column is_news_grounded
+		dataType: boolean
+		isHidden
+		summarizeBy: none
+		sourceColumn: is_news_grounded
+
+	column turn_count
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: turn_count
+
+	column user_turns
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_turns
+
+	column corrected_turns
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: corrected_turns
+
+	column duration_min
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: duration_min
+
+	partition fact_conversation = entity
+		mode: directLake
+		source
+			entityName: fact_conversation
+			schemaName: dbo
+			expressionSource: DirectLake

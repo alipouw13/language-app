@@ -1,0 +1,59 @@
+table dim_news
+
+	/// Distinct enriched news items.
+	measure 'News Items' = DISTINCTCOUNT(dim_news[news_id])
+		formatString: #,##0
+
+	column news_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: news_id
+
+	column 'News Language'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: language
+
+	column 'News CEFR'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: cefr_level
+
+	column Domain
+		dataType: string
+		summarizeBy: none
+		sourceColumn: domain
+
+	column 'Source Country'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: source_country
+
+	column Headline
+		dataType: string
+		summarizeBy: none
+		sourceColumn: title_translated
+
+	column Summary
+		dataType: string
+		summarizeBy: none
+		sourceColumn: summary
+
+	column 'English Gloss'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: english_gloss
+
+	column seen_date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: seen_date_key
+
+	partition dim_news = entity
+		mode: directLake
+		source
+			entityName: dim_news
+			schemaName: dbo
+			expressionSource: DirectLake

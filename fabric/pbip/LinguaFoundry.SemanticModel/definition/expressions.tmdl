@@ -1,0 +1,5 @@
+expression DirectLake =
+		let
+			Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/7c333662-7d4e-4a46-bac0-0b5baa586ea1/0ced4b34-1289-4efd-8039-257d3004b882", [HierarchicalNavigation=true])
+		in
+			Source

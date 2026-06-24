@@ -1,0 +1,63 @@
+table fact_news_engagement
+
+	/// News-grounded conversation x news rows.
+	measure 'News Engagements' = COUNTROWS(fact_news_engagement)
+		formatString: #,##0
+
+	column id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: id
+
+	column user_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: user_id
+
+	column date_key
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column news_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: news_id
+
+	column 'News Language'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: news_language
+
+	column 'News CEFR'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: news_cefr
+
+	column Domain
+		dataType: string
+		summarizeBy: none
+		sourceColumn: domain
+
+	column turn_count
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: turn_count
+
+	column duration_min
+		dataType: double
+		isHidden
+		summarizeBy: none
+		sourceColumn: duration_min
+
+	partition fact_news_engagement = entity
+		mode: directLake
+		source
+			entityName: fact_news_engagement
+			schemaName: dbo
+			expressionSource: DirectLake

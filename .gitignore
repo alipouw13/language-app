@@ -82,3 +82,8 @@ azureconfig.json
 # Local development
 *.local
 .cache/
+
+# Scratch / throwaway files (never commit)
+_tmp_*
+*.tmp
+scratch_*

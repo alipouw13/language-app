@@ -123,6 +123,20 @@ npm run dev
 
 Open http://localhost:5173
 
+### Configuration & secrets
+
+- Copy each `.env.example` to `.env` and fill in your own values. **Only the
+  `.env.example` templates are tracked** — real `.env` files are gitignored and
+  must never be committed.
+- **No API keys are required to run the app.** Services authenticate to Azure
+  with Microsoft Entra ID via `DefaultAzureCredential` (your `az login` locally,
+  a managed identity when hosted).
+- The starter Power BI project
+  (`fabric/pbip/LinguaFoundry.SemanticModel/definition/expressions.tmdl`) embeds
+  the Fabric **workspace + lakehouse GUIDs** it was authored against. These are
+  resource identifiers, not credentials, but if you clone into your own workspace
+  update them (see [Starter Power BI report](#starter-power-bi-report-pbip)).
+
 ## Two layers of authentication
 
 It's worth being precise about what "Entra auth for everything" means here, because

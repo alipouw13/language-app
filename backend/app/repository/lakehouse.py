@@ -111,10 +111,12 @@ class LakehouseClient:
             return False
 
     def _read_all(self, table: str, schema: pa.Schema) -> list[dict[str, Any]]:
-        if not self._exists(table):
-            return []
         uri = self._table_uri(table)
-        dt = DeltaTable(uri, storage_options=self._storage_options())
+        # Open the Delta table once; a missing table raises and reads as empty.
+        try:
+            dt = DeltaTable(uri, storage_options=self._storage_options())
+        except Exception:  # noqa: BLE001 — delta-rs raises TableNotFoundError
+            return []
         return dt.to_pyarrow_table().to_pylist()
 
     def _write(

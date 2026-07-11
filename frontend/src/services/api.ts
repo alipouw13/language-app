@@ -23,6 +23,9 @@ import type {
 const api = axios.create({
   baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
+  // Long enough for the slowest legitimate LLM call (worksheet generation),
+  // but bounded so a hung/unreachable backend fails fast with a clear message.
+  timeout: 120000,
 });
 
 // Attach the Entra bearer token to every request (no-op when auth disabled).
@@ -33,6 +36,25 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Turn low-level axios failures into actionable messages. A missing response
+// means we never reached the API (backend down, proxy error, or timeout).
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response) {
+      const detail = error.response.data?.detail;
+      if (typeof detail === 'string' && detail) {
+        error.message = detail;
+      }
+    } else if (error?.code === 'ECONNABORTED') {
+      error.message = 'The request timed out. The server is taking too long — please try again.';
+    } else if (error?.request) {
+      error.message = 'Cannot reach the server. Make sure the backend API is running, then retry.';
+    }
+    return Promise.reject(error);
+  },
+);
 
 /** Authorization header for raw fetch() calls (e.g. multipart upload). */
 export async function authHeader(): Promise<Record<string, string>> {

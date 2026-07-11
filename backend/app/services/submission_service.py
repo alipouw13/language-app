@@ -14,6 +14,7 @@ server-side at submit time so the recorded data is complete.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from app.models.pydantic_models import (
@@ -41,8 +42,25 @@ async def submit_worksheet(
         i.exercise_id: i for i in items if i.exercise_id
     }
 
+    # Grade any answered-but-unscored exercises concurrently so submit doesn't
+    # serialize N LLM round-trips.
+    async def _maybe_eval(ex: dict):
+        item = by_exercise.get(ex["id"])
+        user_answer = (item.user_answer if item else "") or ""
+        if user_answer.strip() and (item is None or item.final_score is None):
+            try:
+                return await evaluate_answer(
+                    ExerciseSubmission(exercise_id=ex["id"], user_answer=user_answer),
+                    user_id,
+                )
+            except Exception:
+                logger.exception("Server-side evaluation failed for exercise %s", ex["id"])
+        return None
+
+    evals = await asyncio.gather(*(_maybe_eval(ex) for ex in lesson["exercises"]))
+
     resolved: list[dict] = []
-    for ex in lesson["exercises"]:
+    for ex, ev in zip(lesson["exercises"], evals):
         item = by_exercise.get(ex["id"])
         user_answer = (item.user_answer if item else "") or ""
 
@@ -54,18 +72,11 @@ async def submit_worksheet(
         feedback = item.feedback if item else None
 
         # Complete the record server-side if answered but never scored.
-        if user_answer.strip() and final_score is None:
-            try:
-                ev = await evaluate_answer(
-                    ExerciseSubmission(exercise_id=ex["id"], user_answer=user_answer),
-                    user_id,
-                )
-                final_score, final_is_correct, feedback = ev.score, ev.is_correct, ev.feedback
-                attempts = max(attempts, 1)
-                if first_score is None:
-                    first_score, first_is_correct = ev.score, ev.is_correct
-            except Exception:
-                logger.exception("Server-side evaluation failed for exercise %s", ex["id"])
+        if ev is not None and final_score is None:
+            final_score, final_is_correct, feedback = ev.score, ev.is_correct, ev.feedback
+            attempts = max(attempts, 1)
+            if first_score is None:
+                first_score, first_is_correct = ev.score, ev.is_correct
 
         resolved.append(
             {

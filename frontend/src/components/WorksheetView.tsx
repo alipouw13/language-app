@@ -45,10 +45,11 @@ export default function WorksheetView({
       setEvals((prev) => ({ ...prev, [i]: result }));
       setFirstEvals((prev) => (prev[i] ? prev : { ...prev, [i]: result }));
       setAttempts((prev) => ({ ...prev, [i]: (prev[i] ?? 0) + 1 }));
-    } catch {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Evaluation failed';
       setEvals((prev) => ({
         ...prev,
-        [i]: { is_correct: false, score: 0, feedback: 'Evaluation failed', correct_answer: '' },
+        [i]: { is_correct: false, score: 0, feedback: message, correct_answer: '' },
       }));
     } finally {
       setBusy(null);

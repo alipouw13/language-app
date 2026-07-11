@@ -65,19 +65,26 @@ async def create_chat_completion(
     temperature: float = 0.4,
     max_tokens: int = 2048,
     json_mode: bool = False,
+    reasoning_effort: str | None = None,
 ) -> str:
     """Create a chat completion, adapting parameters to the deployment.
 
     Works against any AsyncAzureOpenAI client (main chat or Foundry) so callers
     share one resilient implementation. Returns the assistant message content.
+
+    ``reasoning_effort`` (e.g. ``"minimal"``) is sent to reasoning-style models
+    to cut latency on simple tasks; it is dropped automatically on deployments
+    that reject it.
     """
     caps = _model_caps.setdefault(
-        model, {"token_param": "max_completion_tokens", "temperature": True}
+        model,
+        {"token_param": "max_completion_tokens", "temperature": True, "reasoning_effort": True},
     )
+    caps.setdefault("reasoning_effort", True)
 
     response = None
     # Retry loop: at most a few attempts while we learn what the model rejects.
-    for _ in range(4):
+    for _ in range(5):
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": messages,
@@ -87,6 +94,8 @@ async def create_chat_completion(
             kwargs["temperature"] = temperature
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
+        if reasoning_effort and caps["reasoning_effort"]:
+            kwargs["reasoning_effort"] = reasoning_effort
 
         try:
             response = await client.chat.completions.create(**kwargs)
@@ -105,6 +114,10 @@ async def create_chat_completion(
             if param == "temperature" and caps["temperature"]:
                 caps["temperature"] = False
                 logger.info("Model %s: temperature not supported, using default", model)
+                continue
+            if param == "reasoning_effort" and caps["reasoning_effort"]:
+                caps["reasoning_effort"] = False
+                logger.info("Model %s: reasoning_effort not supported, dropping", model)
                 continue
             raise
 
@@ -133,7 +146,7 @@ def _unsupported_param(exc: BadRequestError) -> str | None:
     if not msg:
         msg = str(exc)
 
-    if param in ("max_tokens", "max_completion_tokens", "temperature"):
+    if param in ("max_tokens", "max_completion_tokens", "temperature", "reasoning_effort"):
         return param
 
     msg_l = msg.lower()
@@ -143,6 +156,8 @@ def _unsupported_param(exc: BadRequestError) -> str | None:
         return "max_tokens"
     if "temperature" in msg_l:
         return "temperature"
+    if "reasoning_effort" in msg_l:
+        return "reasoning_effort"
     return None
 
 
@@ -152,6 +167,7 @@ async def chat_completion(
     temperature: float = 0.4,
     max_tokens: int = 2048,
     json_mode: bool = False,
+    reasoning_effort: str | None = None,
 ) -> str:
     """Send a chat completion request to the main chat deployment."""
     s = get_settings()
@@ -162,6 +178,7 @@ async def chat_completion(
         temperature=temperature,
         max_tokens=max_tokens,
         json_mode=json_mode,
+        reasoning_effort=reasoning_effort,
     )
 
 
@@ -170,6 +187,7 @@ async def chat_completion_json(
     *,
     temperature: float = 0.3,
     max_tokens: int = 4096,
+    reasoning_effort: str | None = None,
 ) -> dict[str, Any]:
     """Chat completion that parses the response as JSON.
 
@@ -180,6 +198,7 @@ async def chat_completion_json(
         temperature=temperature,
         max_tokens=max_tokens,
         json_mode=True,
+        reasoning_effort=reasoning_effort,
     )
     return parse_json(raw)
 

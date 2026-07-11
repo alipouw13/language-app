@@ -52,7 +52,9 @@ class Settings(BaseSettings):
 
     # --- Azure OpenAI (chat / evaluation — Entra authentication) ---
     azure_openai_endpoint: str = ""
-    azure_openai_api_version: str = "2024-10-21"
+    # 2025-03-01-preview is markedly faster for reasoning-style deployments and
+    # supports reasoning_effort; older stable versions (e.g. 2024-10-21) are slower.
+    azure_openai_api_version: str = "2025-03-01-preview"
     azure_openai_deployment: str = "gpt-4.1-mini"
 
     # --- Azure AI Foundry (speech + translation models — Entra auth) ---

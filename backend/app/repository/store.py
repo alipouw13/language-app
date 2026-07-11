@@ -176,6 +176,41 @@ def _coerce(row: dict[str, Any], schema: pa.Schema) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
+# In-process caches                                                            #
+# --------------------------------------------------------------------------- #
+# Exercises are immutable once created, so caching them per-process removes a
+# full-table OneLake scan from the hot grading path (every "Check" click). Known
+# user ids are cached the same way so repeat requests skip the users scan.
+_exercise_cache: dict[str, dict[str, Any]] = {}
+_known_user_ids: set[str] = set()
+
+# Fire-and-forget background writes (e.g. per-exercise scores) are kept off the
+# request's critical path. We hold references so tasks aren't garbage-collected.
+_bg_tasks: set[Any] = set()
+
+
+def _cache_exercise(row: dict[str, Any]) -> None:
+    eid = row.get("id")
+    if eid:
+        _exercise_cache[eid] = dict(row)
+
+
+def _spawn_bg(coro) -> None:
+    """Schedule *coro* to run detached from the caller; log any failure."""
+    import asyncio
+
+    async def _runner() -> None:
+        try:
+            await coro
+        except Exception:  # noqa: BLE001
+            logger.exception("Background store write failed")
+
+    task = asyncio.create_task(_runner())
+    _bg_tasks.add(task)
+    task.add_done_callback(_bg_tasks.discard)
+
+
+# --------------------------------------------------------------------------- #
 # Startup                                                                      #
 # --------------------------------------------------------------------------- #
 async def ensure_ready() -> dict[str, Any]:
@@ -254,12 +289,17 @@ async def get_or_create_user(
     native_language: str = "en",
 ) -> str:
     """Return an existing user id or create a new user, returning its id."""
+    # Fast path: a user id we've already confirmed/created this process.
+    if user_id and user_id in _known_user_ids:
+        return user_id
+
     lake = get_lakehouse()
     schema = _schema(USERS)
     users = await lake.read_all(USERS, schema)
 
     if user_id:
         if any(u["id"] == user_id for u in users):
+            _known_user_ids.add(user_id)
             return user_id
         row = _coerce(
             {
@@ -271,6 +311,7 @@ async def get_or_create_user(
             schema,
         )
         await lake.append(USERS, [row], schema)
+        _known_user_ids.add(user_id)
         return user_id
 
     new_id = _new_id()
@@ -284,6 +325,7 @@ async def get_or_create_user(
         schema,
     )
     await lake.append(USERS, [row], schema)
+    _known_user_ids.add(new_id)
     return new_id
 
 
@@ -345,6 +387,8 @@ async def create_lesson(
         )
     if exercise_rows:
         await lake.append(EXERCISES, exercise_rows, _schema(EXERCISES))
+        for row in exercise_rows:
+            _cache_exercise(row)
 
     return lesson_id, exercise_ids
 
@@ -394,15 +438,24 @@ async def list_lessons(
 async def list_exercises_by_lesson(lesson_id: str) -> list[dict[str, Any]]:
     lake = get_lakehouse()
     rows = await lake.read_all(EXERCISES, _schema(EXERCISES))
+    for row in rows:
+        _cache_exercise(row)
     rows = [e for e in rows if e["lesson_id"] == lesson_id]
     rows.sort(key=lambda e: e["order_index"])
     return rows
 
 
 async def get_exercise(exercise_id: str) -> dict[str, Any] | None:
+    # Exercises are immutable — serve from the in-process cache when present to
+    # avoid a full-table OneLake scan on every grading request.
+    cached = _exercise_cache.get(exercise_id)
+    if cached is not None:
+        return dict(cached)
     lake = get_lakehouse()
     rows = await lake.read_all(EXERCISES, _schema(EXERCISES))
-    return next((e for e in rows if e["id"] == exercise_id), None)
+    for row in rows:
+        _cache_exercise(row)
+    return next((dict(e) for e in rows if e["id"] == exercise_id), None)
 
 
 async def record_exercise_score(
@@ -413,6 +466,7 @@ async def record_exercise_score(
     is_correct: bool,
     score: float,
     feedback: str,
+    background: bool = False,
 ) -> None:
     lake = get_lakehouse()
     row = _coerce(
@@ -428,6 +482,11 @@ async def record_exercise_score(
         },
         _schema(EXERCISE_SCORES),
     )
+    if background:
+        # Keep the OneLake append off the request's critical path; the score is
+        # still persisted for reporting, just not awaited by the HTTP response.
+        _spawn_bg(lake.append(EXERCISE_SCORES, [row], _schema(EXERCISE_SCORES)))
+        return
     await lake.append(EXERCISE_SCORES, [row], _schema(EXERCISE_SCORES))
 
 

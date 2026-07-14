@@ -254,3 +254,33 @@ export async function getSubmission(submissionId: string): Promise<SubmissionDet
   const { data } = await api.get(`/lessons/submissions/${submissionId}`);
   return data;
 }
+
+/**
+ * Export one or more saved worksheets as a single downloadable document and
+ * trigger a browser download. `format` is 'html' (printable, default) or 'md'.
+ */
+export async function exportLessons(
+  lessonIds: string[],
+  format: 'html' | 'md' = 'html',
+): Promise<void> {
+  const res = await api.post(
+    '/lessons/export',
+    { lesson_ids: lessonIds, format },
+    { responseType: 'blob' },
+  );
+
+  // Prefer the server-provided filename from Content-Disposition.
+  const disposition = (res.headers?.['content-disposition'] as string) || '';
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+  const fallback = `language-worksheets.${format}`;
+  const filename = match ? decodeURIComponent(match[1]) : fallback;
+
+  const url = URL.createObjectURL(res.data as Blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}

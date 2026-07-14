@@ -9,6 +9,7 @@ leak into the data store. Caller identity comes from the Entra principal
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -114,6 +115,13 @@ class WorksheetSubmissionResult(BaseModel):
     first_correct_count: int
     final_correct_count: int
     submitted_at: datetime
+
+
+class WorksheetExportRequest(BaseModel):
+    """Request to export one or more saved worksheets as a single document."""
+
+    lesson_ids: list[str] = Field(default_factory=list, min_length=1, max_length=100)
+    format: Literal["html", "md"] = "html"
 
 
 # --------------------------------------------------------------------------- #

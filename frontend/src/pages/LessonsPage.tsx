@@ -12,6 +12,7 @@ import {
   getConversation,
   getLesson,
   getSubmission,
+  exportLessons,
   listConversations,
   listLessons,
   listSubmissions,
@@ -23,6 +24,7 @@ import {
   Card,
   EmptyState,
   LanguageBadge,
+  Select,
   Spinner,
 } from '../components/ui';
 import InteractiveText from '../components/InteractiveText';
@@ -44,6 +46,11 @@ export default function LessonsPage() {
   const [sPage, setSPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Multi-select export (worksheets tab): selected lesson ids across pages.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [exportFormat, setExportFormat] = useState<'html' | 'md'>('html');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -103,6 +110,42 @@ export default function LessonsPage() {
     setSelectedLesson(null);
     setSelectedConvo(null);
     setSelectedSub(null);
+    setSelected(new Set());
+    setError(null);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const pageIds = lessons?.items.map((l) => l.id) ?? [];
+  const allOnPageSelected = pageIds.length > 0 && pageIds.every((id) => selected.has(id));
+
+  const toggleSelectAllOnPage = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allOnPageSelected) pageIds.forEach((id) => next.delete(id));
+      else pageIds.forEach((id) => next.add(id));
+      return next;
+    });
+  };
+
+  const doExport = async () => {
+    if (selected.size === 0) return;
+    setExporting(true);
+    setError(null);
+    try {
+      await exportLessons(Array.from(selected), exportFormat);
+    } catch {
+      setError('Failed to export worksheets');
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -318,21 +361,68 @@ export default function LessonsPage() {
           {lessons.items.length === 0 ? (
             <EmptyState>No worksheets yet — generate one to get started.</EmptyState>
           ) : (
-            lessons.items.map((l) => (
-              <div key={l.id} className="list-item" onClick={() => openLesson(l.id)}>
-                <div>
-                  <strong>{l.scenario}</strong>
-                  <br />
-                  <small className="muted">
-                    {new Date(l.created_at).toLocaleDateString()} · {l.exercise_count} exercises
-                  </small>
-                </div>
-                <div className="list-meta">
-                  <LanguageBadge code={l.target_language} />
-                  <Badge>{l.difficulty}</Badge>
+            <>
+              <div className="export-bar">
+                <label className="export-check">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleSelectAllOnPage}
+                    aria-label="Select all worksheets on this page"
+                  />
+                  <span>Select page</span>
+                </label>
+                <span className="muted export-count">
+                  {selected.size} selected
+                </span>
+                <div className="export-actions">
+                  {selected.size > 0 && (
+                    <Button variant="ghost" onClick={() => setSelected(new Set())}>
+                      Clear
+                    </Button>
+                  )}
+                  <Select
+                    value={exportFormat}
+                    onChange={(e) => setExportFormat(e.target.value as 'html' | 'md')}
+                    aria-label="Export format"
+                  >
+                    <option value="html">HTML (printable)</option>
+                    <option value="md">Markdown</option>
+                  </Select>
+                  <Button
+                    variant="secondary"
+                    disabled={selected.size === 0 || exporting}
+                    onClick={doExport}
+                  >
+                    {exporting ? <Spinner label="Exporting…" /> : `Export (${selected.size})`}
+                  </Button>
                 </div>
               </div>
-            ))
+              {lessons.items.map((l) => (
+                <div key={l.id} className="list-item selectable">
+                  <input
+                    type="checkbox"
+                    className="list-select"
+                    checked={selected.has(l.id)}
+                    onChange={() => toggleSelect(l.id)}
+                    aria-label={`Select worksheet: ${l.scenario}`}
+                  />
+                  <div className="list-body" onClick={() => openLesson(l.id)}>
+                    <div>
+                      <strong>{l.scenario}</strong>
+                      <br />
+                      <small className="muted">
+                        {new Date(l.created_at).toLocaleDateString()} · {l.exercise_count} exercises
+                      </small>
+                    </div>
+                    <div className="list-meta">
+                      <LanguageBadge code={l.target_language} />
+                      <Badge>{l.difficulty}</Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
           )}
           {lessons.total > lessons.page_size && (
             <div className="pagination">

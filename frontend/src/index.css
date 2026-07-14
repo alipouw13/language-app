@@ -625,6 +625,57 @@ textarea.control {
   color: var(--muted);
 }
 
+/* ---------------------------------------------------- Worksheet export bar */
+.export-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+.export-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+.export-count {
+  font-size: 0.85rem;
+}
+.export-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+.export-actions .control {
+  width: auto;
+  min-width: 9.5rem;
+}
+.list-item.selectable {
+  cursor: default;
+}
+.list-item.selectable .list-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+.list-select {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--primary, #1e2761);
+}
+
 /* ------------------------------------------------------------------ Translate */
 .checkrow {
   display: flex;

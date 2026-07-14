@@ -405,6 +405,28 @@ async def get_lesson(lesson_id: str) -> dict[str, Any] | None:
     return lesson
 
 
+async def get_lessons_by_ids(lesson_ids: list[str]) -> dict[str, dict[str, Any]]:
+    """Fetch several lessons in a single table scan.
+
+    Returns a mapping of ``lesson_id -> lesson`` (with a parsed ``worksheet``).
+    Unlike :func:`get_lesson`, exercises are **not** attached, so callers that
+    only need the worksheet content (e.g. export) avoid a second full-table
+    scan per lesson. Ids with no matching lesson are simply absent.
+    """
+    if not lesson_ids:
+        return {}
+    wanted = set(lesson_ids)
+    lake = get_lakehouse()
+    lessons = await lake.read_all(LESSONS, _schema(LESSONS))
+    out: dict[str, dict[str, Any]] = {}
+    for l in lessons:
+        if l["id"] in wanted:
+            row = dict(l)
+            row["worksheet"] = json.loads(row.pop("worksheet_json"))
+            out[l["id"]] = row
+    return out
+
+
 async def list_lessons(
     user_id: str | None, page: int, page_size: int
 ) -> tuple[list[dict[str, Any]], int]:

@@ -1,4 +1,23 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/2.0.0/schema.json",
-  "themeCollection": {}
+  "themeCollection": {
+    "customTheme": {
+      "name": "LinguaFoundry",
+      "reportVersionAtImport": "5.61",
+      "type": "RegisteredResources"
+    }
+  },
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "LinguaFoundry4F46E5.json",
+          "path": "LinguaFoundry4F46E5.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ]
 }

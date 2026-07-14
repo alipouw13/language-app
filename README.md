@@ -26,6 +26,9 @@ real conversations by voice or text. Everything is secured with **Microsoft Entr
   it under **History → Progress**. Ready for Power BI reporting.
 - **History** — every worksheet, conversation and submission is persisted to OneLake and
   browsable per user.
+- **Export worksheets to study offline** — select any number of saved worksheets under
+  **History → Worksheets** and export them as a single, self-contained **HTML** (printable /
+  save-as-PDF) or **Markdown** document, complete with the answer key, to read or revise later.
 - **Current-events conversations (Real-Time Intelligence)** — stream real news (GDELT) into
   a Fabric **Eventhouse**, enrich it with Foundry (translate → ES/FR, summarize, CEFR-grade,
   tag verbs/tenses/topics, embed), then practise a conversation grounded in a fresh, real
@@ -377,20 +380,28 @@ and example measures are documented in the Gold notebook's closing cell.
 
 ### Starter Power BI report (PBIP)
 
-`fabric/pbip/LinguaFoundry.pbip` is a ready-to-open **Power BI Project** (TMDL, git-friendly)
-with a **Direct Lake** semantic model over `LH_LanguageApp_Gold` — 11 tables, 18 relationships,
-and 20 measures (submissions, accuracy/improvement, conversations, **News-Grounded %**, etc.).
-It was authored with the Fabric **`semantic-model-authoring`** skill (from the
+`fabric/pbip/LinguaFoundry.pbip` is a ready-to-open **Power BI Project** (TMDL + enhanced
+**PBIR** report, git-friendly) with a **Direct Lake** semantic model over `LH_LanguageApp_Gold`
+— 11 tables, 18 relationships, and 20 measures (submissions, accuracy/improvement,
+conversations, **News-Grounded %**, etc.). It ships with a **pre-built, purple-themed
+Overview page** (left nav, header, three slicers, five KPI cards, and six charts incl. a
+top-news table) styled with the app's indigo/violet palette (`#4F46E5`→`#8B5CF6`). Authored
+with the Fabric **`semantic-model-authoring`** skill (from the
 [skills-for-fabric](https://github.com/microsoft/skills-for-fabric) Copilot plugin).
 
 To use it:
 
-1. Run the Silver + Gold notebooks first so `LH_LanguageApp_Gold` has data.
-2. Open `fabric/pbip/LinguaFoundry.pbip` in **Power BI Desktop** (Preview: enable *Power BI
-   Project (.pbip)* files). The model binds to the Gold lakehouse via a Direct Lake named
-   expression (`expressions.tmdl`) using the workspace + lakehouse GUIDs.
-3. On first open, confirm the OneLake connection if prompted, then build visuals on the blank
-   **Overview** page and publish to the **Language App** workspace.
+1. In **Power BI Desktop**, enable two preview features (once): *File → Options → Preview
+   features →* **Power BI Project (.pbip) save option** and **Store reports using enhanced
+   metadata format (PBIR)**. Opening the enhanced-format report needs PBIR support.
+2. Run the Silver + Gold notebooks first so `LH_LanguageApp_Gold` has data.
+3. Open `fabric/pbip/LinguaFoundry.pbip`. The model binds to the Gold lakehouse via a Direct
+   Lake named expression (`expressions.tmdl`); on first open, confirm the OneLake connection
+   if prompted. The Overview page renders automatically; publish to the **Language App** workspace.
+
+> **Purple theme** lives in `LinguaFoundry.Report/StaticResources/RegisteredResources/` and is
+> registered in `report.json`; all visuals inherit the palette. Every PBIP file is validated
+> against Microsoft's published JSON schemas (report/page/visual/version/pbir/pbism).
 
 > The Direct Lake expression points at the workspace/lakehouse GUIDs resolved for this repo
 > (`Language App` / `LH_LanguageApp_Gold`). If you clone into a different workspace, update the
@@ -437,6 +448,7 @@ conversation `news_id` column on an existing lakehouse:
 | `GET`  | `/api/lessons/conversations` | List conversations |
 | `GET`  | `/api/lessons/submissions` | List worksheet submissions (progress) |
 | `GET`  | `/api/lessons/submissions/{id}` | Submission detail with response rows |
+| `POST` | `/api/lessons/export` | Export selected worksheets as one HTML/Markdown document |
 
 ## Project structure
 
@@ -444,7 +456,7 @@ conversation `news_id` column on an existing lakehouse:
 backend/app/
 ├── api/           # Route handlers (Entra-protected)
 ├── auth/          # Entra ID JWT validation
-├── services/      # LLM, translation, speech, worksheet, conversation, submission, news (RTI) logic
+├── services/      # LLM, translation, speech, worksheet, conversation, submission, export, news (RTI) logic
 ├── repository/    # Fabric OneLake Lakehouse (Delta) data layer + entity store; Eventhouse (RTI) store
 ├── models/        # Pydantic schemas
 └── config.py

@@ -6,7 +6,7 @@ table dim_language
 		summarizeBy: none
 		sourceColumn: language_code
 
-	column Language
+	column language_name
 		dataType: string
 		summarizeBy: none
 		sourceColumn: language_name

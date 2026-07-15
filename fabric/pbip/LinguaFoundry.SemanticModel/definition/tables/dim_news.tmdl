@@ -10,37 +10,37 @@ table dim_news
 		summarizeBy: none
 		sourceColumn: news_id
 
-	column 'News Language'
+	column language
 		dataType: string
 		summarizeBy: none
 		sourceColumn: language
 
-	column 'News CEFR'
+	column cefr_level
 		dataType: string
 		summarizeBy: none
 		sourceColumn: cefr_level
 
-	column Domain
+	column domain
 		dataType: string
 		summarizeBy: none
 		sourceColumn: domain
 
-	column 'Source Country'
+	column source_country
 		dataType: string
 		summarizeBy: none
 		sourceColumn: source_country
 
-	column Headline
+	column title_translated
 		dataType: string
 		summarizeBy: none
 		sourceColumn: title_translated
 
-	column Summary
+	column summary
 		dataType: string
 		summarizeBy: none
 		sourceColumn: summary
 
-	column 'English Gloss'
+	column english_gloss
 		dataType: string
 		summarizeBy: none
 		sourceColumn: english_gloss

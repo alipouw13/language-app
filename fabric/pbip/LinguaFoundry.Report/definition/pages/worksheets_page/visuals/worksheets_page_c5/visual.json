@@ -23,11 +23,12 @@
                       "Entity": "dim_scenario"
                     }
                   },
-                  "Property": "Scenario"
+                  "Property": "scenario_name"
                 }
               },
-              "queryRef": "dim_scenario.Scenario",
-              "nativeQueryRef": "Scenario"
+              "queryRef": "dim_scenario.scenario_name",
+              "nativeQueryRef": "scenario_name",
+              "displayName": "Scenario"
             },
             {
               "field": {

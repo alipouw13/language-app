@@ -28,17 +28,17 @@ table fact_news_engagement
 		summarizeBy: none
 		sourceColumn: news_id
 
-	column 'News Language'
+	column news_language
 		dataType: string
 		summarizeBy: none
 		sourceColumn: news_language
 
-	column 'News CEFR'
+	column news_cefr
 		dataType: string
 		summarizeBy: none
 		sourceColumn: news_cefr
 
-	column Domain
+	column domain
 		dataType: string
 		summarizeBy: none
 		sourceColumn: domain

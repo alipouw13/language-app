@@ -76,12 +76,12 @@ table fact_submission
 		summarizeBy: none
 		sourceColumn: mode
 
-	column Verb
+	column verb
 		dataType: string
 		summarizeBy: none
 		sourceColumn: verb
 
-	column 'Grammar Focus'
+	column grammar_focus
 		dataType: string
 		summarizeBy: none
 		sourceColumn: grammar_focus

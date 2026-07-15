@@ -23,11 +23,12 @@
                       "Entity": "dim_date"
                     }
                   },
-                  "Property": "Month Name"
+                  "Property": "month_name"
                 }
               },
-              "queryRef": "dim_date.Month Name",
-              "nativeQueryRef": "Month Name",
+              "queryRef": "dim_date.month_name",
+              "nativeQueryRef": "month_name",
+              "displayName": "Month",
               "active": true
             }
           ]

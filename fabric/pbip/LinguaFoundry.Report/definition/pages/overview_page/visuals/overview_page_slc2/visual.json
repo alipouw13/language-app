@@ -23,11 +23,12 @@
                       "Entity": "dim_date"
                     }
                   },
-                  "Property": "Year"
+                  "Property": "year"
                 }
               },
-              "queryRef": "dim_date.Year",
-              "nativeQueryRef": "Year"
+              "queryRef": "dim_date.year",
+              "nativeQueryRef": "year",
+              "displayName": "Year"
             }
           ]
         }

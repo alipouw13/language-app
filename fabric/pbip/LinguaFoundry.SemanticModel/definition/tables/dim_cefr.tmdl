@@ -1,12 +1,12 @@
 table dim_cefr
 
-	column 'CEFR Level'
+	column cefr_level
 		dataType: string
 		summarizeBy: none
 		sourceColumn: cefr_level
-		sortByColumn: 'CEFR Order'
+		sortByColumn: cefr_order
 
-	column 'CEFR Order'
+	column cefr_order
 		dataType: int64
 		isHidden
 		summarizeBy: none

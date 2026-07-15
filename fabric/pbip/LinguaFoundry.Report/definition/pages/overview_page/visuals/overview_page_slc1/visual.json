@@ -23,11 +23,12 @@
                       "Entity": "dim_cefr"
                     }
                   },
-                  "Property": "CEFR Level"
+                  "Property": "cefr_level"
                 }
               },
-              "queryRef": "dim_cefr.CEFR Level",
-              "nativeQueryRef": "CEFR Level"
+              "queryRef": "dim_cefr.cefr_level",
+              "nativeQueryRef": "cefr_level",
+              "displayName": "CEFR level"
             }
           ]
         }

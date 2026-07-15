@@ -23,11 +23,12 @@
                       "Entity": "fact_response"
                     }
                   },
-                  "Property": "Exercise Type"
+                  "Property": "exercise_type"
                 }
               },
-              "queryRef": "fact_response.Exercise Type",
-              "nativeQueryRef": "Exercise Type",
+              "queryRef": "fact_response.exercise_type",
+              "nativeQueryRef": "exercise_type",
+              "displayName": "Exercise type",
               "active": true
             }
           ]

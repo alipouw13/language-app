@@ -23,11 +23,12 @@
                       "Entity": "dim_language"
                     }
                   },
-                  "Property": "Language"
+                  "Property": "language_name"
                 }
               },
-              "queryRef": "dim_language.Language",
-              "nativeQueryRef": "Language"
+              "queryRef": "dim_language.language_name",
+              "nativeQueryRef": "language_name",
+              "displayName": "Language"
             },
             {
               "field": {

@@ -52,11 +52,11 @@ relationship rel_13_fact_conversation_dim_language
 
 relationship rel_14_fact_submission_dim_cefr
 	fromColumn: fact_submission.cefr_level
-	toColumn: dim_cefr.'CEFR Level'
+	toColumn: dim_cefr.cefr_level
 
 relationship rel_15_fact_response_dim_cefr
 	fromColumn: fact_response.cefr_level
-	toColumn: dim_cefr.'CEFR Level'
+	toColumn: dim_cefr.cefr_level
 
 relationship rel_16_fact_submission_dim_scenario
 	fromColumn: fact_submission.scenario_key

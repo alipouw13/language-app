@@ -23,11 +23,12 @@
                       "Entity": "fact_news_engagement"
                     }
                   },
-                  "Property": "Domain"
+                  "Property": "domain"
                 }
               },
-              "queryRef": "fact_news_engagement.Domain",
-              "nativeQueryRef": "Domain",
+              "queryRef": "fact_news_engagement.domain",
+              "nativeQueryRef": "domain",
+              "displayName": "Domain",
               "active": true
             }
           ]

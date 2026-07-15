@@ -398,10 +398,22 @@ To use it:
 3. Open `fabric/pbip/LinguaFoundry.pbip`. The model binds to the Gold lakehouse via a Direct
    Lake named expression (`expressions.tmdl`); on first open, confirm the OneLake connection
    if prompted. The Overview page renders automatically; publish to the **Language App** workspace.
+4. **If a connection prompt or *Data source settings* dialog appears, select the Gold lakehouse
+   and tick *all 11 tables*.** Direct Lake models only load the tables you check; leaving any
+   unselected shows *"table … is not refreshed"* on the visuals that use it.
+
+> **Navigation** — the four left-nav items (Overview, Worksheets, Conversations, Current events)
+> are clickable. Each is a transparent action button with a `PageNavigation` link, so clicking
+> one jumps straight to that page (works in Desktop and the Service).
 
 > **Purple theme** lives in `LinguaFoundry.Report/StaticResources/RegisteredResources/` and is
 > registered in `report.json`; all visuals inherit the palette. Every PBIP file is validated
 > against Microsoft's published JSON schemas (report/page/visual/version/pbir/pbism).
+
+> **Column names match the source exactly.** Every model column is named identically to its Gold
+> Delta column (`cefr_level`, `month_name`, `language_name`, …) so the model never breaks when
+> Power BI re-derives fields from the Direct Lake source. Friendly captions (*CEFR level*, *Month*,
+> *Language*) are applied per-visual, so axes and slicers still read cleanly.
 
 > The Direct Lake expression points at the workspace/lakehouse GUIDs resolved for this repo
 > (`Language App` / `LH_LanguageApp_Gold`). If you clone into a different workspace, update the

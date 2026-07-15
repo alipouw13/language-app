@@ -23,11 +23,12 @@
                       "Entity": "dim_news"
                     }
                   },
-                  "Property": "News CEFR"
+                  "Property": "cefr_level"
                 }
               },
-              "queryRef": "dim_news.News CEFR",
-              "nativeQueryRef": "News CEFR"
+              "queryRef": "dim_news.cefr_level",
+              "nativeQueryRef": "cefr_level",
+              "displayName": "CEFR level"
             }
           ]
         }

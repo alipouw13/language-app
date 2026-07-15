@@ -23,11 +23,12 @@
                       "Entity": "dim_news"
                     }
                   },
-                  "Property": "News Language"
+                  "Property": "language"
                 }
               },
-              "queryRef": "dim_news.News Language",
-              "nativeQueryRef": "News Language",
+              "queryRef": "dim_news.language",
+              "nativeQueryRef": "language",
+              "displayName": "News language",
               "active": true
             }
           ]

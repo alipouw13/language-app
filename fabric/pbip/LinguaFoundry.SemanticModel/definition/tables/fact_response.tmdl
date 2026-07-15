@@ -54,7 +54,7 @@ table fact_response
 		summarizeBy: none
 		sourceColumn: cefr_level
 
-	column 'Exercise Type'
+	column exercise_type
 		dataType: string
 		summarizeBy: none
 		sourceColumn: exercise_type

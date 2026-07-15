@@ -23,11 +23,12 @@
                       "Entity": "dim_news"
                     }
                   },
-                  "Property": "Headline"
+                  "Property": "title_translated"
                 }
               },
-              "queryRef": "dim_news.Headline",
-              "nativeQueryRef": "Headline"
+              "queryRef": "dim_news.title_translated",
+              "nativeQueryRef": "title_translated",
+              "displayName": "Headline"
             },
             {
               "field": {

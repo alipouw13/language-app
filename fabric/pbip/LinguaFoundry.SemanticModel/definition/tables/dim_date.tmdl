@@ -6,59 +6,59 @@ table dim_date
 		summarizeBy: none
 		sourceColumn: date_key
 
-	column Date
+	column date
 		dataType: string
 		summarizeBy: none
 		sourceColumn: date
 
-	column Year
+	column year
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: year
 
-	column Quarter
+	column quarter
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: quarter
 
-	column Month
+	column month
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: month
 
-	column 'Month Name'
+	column month_name
 		dataType: string
 		summarizeBy: none
 		sourceColumn: month_name
-		sortByColumn: Month
+		sortByColumn: month
 
-	column 'Month Year'
+	column month_year
 		dataType: string
 		summarizeBy: none
 		sourceColumn: month_year
 
-	column Day
+	column day
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: day
 
-	column 'Day Of Week'
+	column day_of_week
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: day_of_week
 
-	column 'Day Name'
+	column day_name
 		dataType: string
 		summarizeBy: none
 		sourceColumn: day_name
-		sortByColumn: 'Day Of Week'
+		sortByColumn: day_of_week
 
-	column 'Week Of Year'
+	column week_of_year
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: week_of_year
 
-	column 'Is Weekend'
+	column is_weekend
 		dataType: boolean
 		summarizeBy: none
 		sourceColumn: is_weekend

@@ -6,12 +6,12 @@ table dim_scenario
 		summarizeBy: none
 		sourceColumn: scenario_key
 
-	column Scenario
+	column scenario_name
 		dataType: string
 		summarizeBy: none
 		sourceColumn: scenario_name
 
-	column Mode
+	column mode
 		dataType: string
 		summarizeBy: none
 		sourceColumn: mode

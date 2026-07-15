@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
   "name": "slc_language",
   "position": {
-    "x": 168,
-    "y": 68,
+    "x": 166,
+    "y": 64,
     "z": 3,
-    "width": 208,
-    "height": 58,
+    "width": 206,
+    "height": 56,
     "tabOrder": 3
   },
   "visual": {
@@ -64,51 +64,8 @@
             }
           }
         }
-      ],
-      "border": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#E6E3F7'"
-                    }
-                  }
-                }
-              }
-            },
-            "radius": {
-              "expr": {
-                "Literal": {
-                  "Value": "8D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "dropShadow": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

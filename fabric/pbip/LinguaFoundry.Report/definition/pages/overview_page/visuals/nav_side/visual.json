@@ -5,7 +5,7 @@
     "x": 0,
     "y": 0,
     "z": 1,
-    "width": 152,
+    "width": 150,
     "height": 720,
     "tabOrder": 1
   },
@@ -19,41 +19,15 @@
               {
                 "textRuns": [
                   {
-                    "value": "Lingua",
+                    "value": "Lingua Foundry",
                     "textStyle": {
                       "fontFamily": "'Segoe UI Semibold'",
-                      "fontSize": "17px",
+                      "fontSize": "15pt",
                       "fontWeight": "bold",
                       "color": "#FFFFFF"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Foundry",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold'",
-                      "fontSize": "17px",
-                      "fontWeight": "bold",
-                      "color": "#FFFFFF"
-                    }
-                  }
-                ],
-                "horizontalTextAlignment": "left"
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": " ",
-                    "textStyle": {
-                      "fontSize": "6px"
-                    }
-                  }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
@@ -61,23 +35,21 @@
                     "value": "Learning analytics",
                     "textStyle": {
                       "fontFamily": "'Segoe UI'",
-                      "fontSize": "10px",
+                      "fontSize": "8pt",
                       "color": "#DBD8FB"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
                   {
                     "value": " ",
                     "textStyle": {
-                      "fontSize": "10px"
+                      "fontSize": "8pt"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
@@ -85,23 +57,21 @@
                     "value": "\u25a0  Overview",
                     "textStyle": {
                       "fontFamily": "'Segoe UI'",
-                      "fontSize": "12px",
+                      "fontSize": "10pt",
                       "color": "#EEECFC"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
                   {
                     "value": " ",
                     "textStyle": {
-                      "fontSize": "6px"
+                      "fontSize": "5pt"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
@@ -109,23 +79,21 @@
                     "value": "\u25cb  Worksheets",
                     "textStyle": {
                       "fontFamily": "'Segoe UI'",
-                      "fontSize": "12px",
+                      "fontSize": "10pt",
                       "color": "#EEECFC"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
                   {
                     "value": " ",
                     "textStyle": {
-                      "fontSize": "6px"
+                      "fontSize": "5pt"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
@@ -133,23 +101,21 @@
                     "value": "\u25cb  Conversations",
                     "textStyle": {
                       "fontFamily": "'Segoe UI'",
-                      "fontSize": "12px",
+                      "fontSize": "10pt",
                       "color": "#EEECFC"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
                   {
                     "value": " ",
                     "textStyle": {
-                      "fontSize": "6px"
+                      "fontSize": "5pt"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               },
               {
                 "textRuns": [
@@ -157,18 +123,18 @@
                     "value": "\u25cb  Current events",
                     "textStyle": {
                       "fontFamily": "'Segoe UI'",
-                      "fontSize": "12px",
+                      "fontSize": "10pt",
                       "color": "#EEECFC"
                     }
                   }
-                ],
-                "horizontalTextAlignment": "left"
+                ]
               }
             ]
           }
         }
       ]
     },
+    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "background": [
         {
@@ -195,19 +161,6 @@
               "expr": {
                 "Literal": {
                   "Value": "0D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "border": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
                 }
               }
             }

@@ -406,6 +406,10 @@ To use it:
 > are clickable. Each is a transparent action button with a `PageNavigation` link, so clicking
 > one jumps straight to that page (works in Desktop and the Service).
 
+> **All chrome uses rectangle *shapes*, never textboxes.** Text labels (brand, header, nav items,
+> chart titles) are rendered as `shape` visuals with on-shape text — shapes clip cleanly and never
+> render the scroll bars that a textbox shows when its content doesn't fit.
+
 > **Purple theme** lives in `LinguaFoundry.Report/StaticResources/RegisteredResources/` and is
 > registered in `report.json`; all visuals inherit the palette. Every PBIP file is validated
 > against Microsoft's published JSON schemas (report/page/visual/version/pbir/pbism).

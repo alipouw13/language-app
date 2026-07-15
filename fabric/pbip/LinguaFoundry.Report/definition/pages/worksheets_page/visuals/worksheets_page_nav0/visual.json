@@ -10,42 +10,48 @@
     "tabOrder": 2
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "shape",
     "objects": {
-      "general": [
+      "shape": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
-                  {
-                    "value": " ",
-                    "textStyle": {
-                      "fontSize": "4pt"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "\u25cb  Overview",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI'",
-                      "fontSize": "10pt",
-                      "color": "#DBD8FB"
-                    }
-                  }
-                ]
+            "tileShape": {
+              "expr": {
+                "Literal": {
+                  "Value": "'rectangle'"
+                }
               }
-            ]
+            }
           }
         }
-      ]
-    },
-    "drillFilterOtherVisuals": true,
-    "visualContainerObjects": {
-      "background": [
+      ],
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "text": [
         {
           "properties": {
             "show": {
@@ -54,28 +60,64 @@
                   "Value": "true"
                 }
               }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'\u25cb   Overview'"
+                }
+              }
             },
-            "color": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#4F46E5'"
+                      "Value": "'#DBD8FB'"
                     }
                   }
                 }
               }
             },
-            "transparency": {
+            "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

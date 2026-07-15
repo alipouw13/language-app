@@ -10,40 +10,38 @@
     "tabOrder": 1
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "shape",
     "objects": {
-      "general": [
+      "shape": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
-                  {
-                    "value": " ",
-                    "textStyle": {
-                      "fontSize": "8pt"
-                    }
-                  }
-                ]
+            "tileShape": {
+              "expr": {
+                "Literal": {
+                  "Value": "'rectangle'"
+                }
               }
-            ]
+            }
           }
         }
-      ]
-    },
-    "drillFilterOtherVisuals": true,
-    "visualContainerObjects": {
-      "background": [
+      ],
+      "outline": [
         {
           "properties": {
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
-            },
-            "color": {
+            }
+          }
+        }
+      ],
+      "fill": [
+        {
+          "properties": {
+            "fillColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -53,17 +51,14 @@
                   }
                 }
               }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
             }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

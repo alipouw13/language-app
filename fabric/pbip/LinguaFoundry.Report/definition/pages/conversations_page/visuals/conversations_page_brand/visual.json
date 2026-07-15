@@ -3,40 +3,55 @@
   "name": "conversations_page_brand",
   "position": {
     "x": 14,
-    "y": 20,
+    "y": 18,
     "z": 2,
     "width": 128,
     "height": 30,
     "tabOrder": 2
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "shape",
     "objects": {
-      "general": [
+      "shape": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
-                  {
-                    "value": "Lingua Foundry",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold'",
-                      "fontSize": "15pt",
-                      "fontWeight": "bold",
-                      "color": "#FFFFFF"
-                    }
-                  }
-                ]
+            "tileShape": {
+              "expr": {
+                "Literal": {
+                  "Value": "'rectangle'"
+                }
               }
-            ]
+            }
           }
         }
-      ]
-    },
-    "drillFilterOtherVisuals": true,
-    "visualContainerObjects": {
-      "background": [
+      ],
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "text": [
         {
           "properties": {
             "show": {
@@ -45,28 +60,71 @@
                   "Value": "true"
                 }
               }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lingua Foundry'"
+                }
+              }
             },
-            "color": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#4F46E5'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
               }
             },
-            "transparency": {
+            "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "15D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

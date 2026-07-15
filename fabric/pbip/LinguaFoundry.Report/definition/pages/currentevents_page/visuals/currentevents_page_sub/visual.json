@@ -3,39 +3,55 @@
   "name": "currentevents_page_sub",
   "position": {
     "x": 14,
-    "y": 52,
+    "y": 50,
     "z": 2,
     "width": 128,
     "height": 18,
     "tabOrder": 2
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "shape",
     "objects": {
-      "general": [
+      "shape": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
-                  {
-                    "value": "Learning analytics",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI'",
-                      "fontSize": "8pt",
-                      "color": "#DBD8FB"
-                    }
-                  }
-                ]
+            "tileShape": {
+              "expr": {
+                "Literal": {
+                  "Value": "'rectangle'"
+                }
               }
-            ]
+            }
           }
         }
-      ]
-    },
-    "drillFilterOtherVisuals": true,
-    "visualContainerObjects": {
-      "background": [
+      ],
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "text": [
         {
           "properties": {
             "show": {
@@ -44,28 +60,64 @@
                   "Value": "true"
                 }
               }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Learning analytics'"
+                }
+              }
             },
-            "color": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#4F46E5'"
+                      "Value": "'#DBD8FB'"
                     }
                   }
                 }
               }
             },
-            "transparency": {
+            "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

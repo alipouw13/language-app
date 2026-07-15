@@ -435,6 +435,35 @@ To use it:
 > 2. **Refresh the model** — click **Refresh** in Power BI Desktop (this reframes Direct Lake), or
 >    trigger a dataset refresh (`refreshType: DirectLakeFraming`). Then the visuals render.
 
+> **Months (and weekdays) sort chronologically, not alphabetically.** `month_name` has
+> `sortByColumn: month` and `day_name` has `sortByColumn: day_of_week` in the TMDL, and the
+> month charts sort by `month_name` ascending so they honor that order. If you rebuild the model
+> by hand, re-apply *Column tools → Sort by column* (`month_name`→`month`, `day_name`→`day_of_week`,
+> `cefr_level`→`cefr_order`) or the axis falls back to A–Z.
+
+#### Deploying a Direct Lake report — why *Publish* and *Save as .pbix* are greyed out
+
+This is expected, not a bug. A **Direct Lake** semantic model lives in a Fabric workspace and reads
+Delta tables straight from OneLake, so:
+
+- **You cannot *Save as .pbix*.** A `.pbix` can only hold an **Import** or **DirectQuery** model —
+  Direct Lake is neither. Desktop opens the PBIP as a *remote* model (`Is Remote Model: True`), so the
+  model isn't embedded locally and there's nothing to write into a `.pbix`.
+- **The Desktop *Publish* button doesn't deploy Direct Lake models.** Publish only pushes a local
+  Import/DirectQuery model. Deploy the PBIP the Fabric way instead:
+  1. **Git integration (recommended)** — in the **Language App** workspace: *Workspace settings → Git
+     integration*, connect this repo/branch, then **Update all**. Fabric materializes
+     `fabric/pbip/LinguaFoundry.SemanticModel` and `…Report` as workspace items, wired to the Gold
+     lakehouse. Commits to `main` sync straight into the workspace.
+  2. **Or upload the folder** — *New → Import → Power BI report* (PBIP folder), or use the Fabric REST
+     `POST /v1/workspaces/{wsId}/items` with the definition parts.
+- **Want the classic Publish / .pbix flow?** Build an **Import** model instead of Direct Lake
+  (*Get data → OneLake / Lakehouse → Import*). That trades live OneLake reads for a scheduled refresh
+  but restores *Save as .pbix* and Desktop *Publish*.
+- If *Publish* is greyed even for Git deployment, confirm you're signed into the **tenant that owns the
+  workspace**, the workspace is on **Fabric/Premium capacity**, and you have **Contributor+** on it.
+
+
 ### Sample data
 
 Populate every table with realistic, report-ready data (50 `Sample User N`,

@@ -456,6 +456,92 @@ erDiagram
    `news_id` is nullable on conversations (not every chat is news-grounded), so a blank member is
    expected there.
 
+#### Which relationships are active (and why)
+
+**The rule:** Power BI allows only **one _active_ filter path between any two tables**. In a pure
+star/galaxy with **single-direction (dim → fact)** relationships there is exactly one path between each
+dimension and each fact, so **all 18 dim → fact relationships stay ACTIVE** — conformed dimensions
+(`dim_date`, `dim_user`, `dim_language`, `dim_cefr`, `dim_news`) shared across several facts are
+completely fine. You only see *"this relationship would create ambiguity, make it inactive"* when a
+relationship **closes a loop** — i.e. it creates a *second* path between two tables. In this model that
+happens only when an edge is added that is **not** a dim → fact key: a fact-to-fact link, a
+dimension-to-dimension (snowflake) link, or a duplicate key. Those are what you must set inactive or
+(better) delete.
+
+```mermaid
+graph LR
+    classDef dim fill:#EDE9FE,stroke:#6D28D9,color:#312E81;
+    classDef fact fill:#F5F3FF,stroke:#A78BFA,color:#312E81;
+
+    dim_date[dim_date]:::dim
+    dim_user[dim_user]:::dim
+    dim_language[dim_language]:::dim
+    dim_cefr[dim_cefr]:::dim
+    dim_scenario[dim_scenario]:::dim
+    dim_news[dim_news]:::dim
+
+    fact_submission[fact_submission]:::fact
+    fact_response[fact_response]:::fact
+    fact_exercise_score[fact_exercise_score]:::fact
+    fact_conversation[fact_conversation]:::fact
+    fact_news_engagement[fact_news_engagement]:::fact
+
+    %% ACTIVE (solid) — conformed dimension to fact, single cross-filter direction
+    dim_date --> fact_submission
+    dim_date --> fact_response
+    dim_date --> fact_exercise_score
+    dim_date --> fact_conversation
+    dim_date --> fact_news_engagement
+    dim_user --> fact_submission
+    dim_user --> fact_response
+    dim_user --> fact_exercise_score
+    dim_user --> fact_conversation
+    dim_user --> fact_news_engagement
+    dim_language --> fact_submission
+    dim_language --> fact_response
+    dim_language --> fact_conversation
+    dim_cefr --> fact_submission
+    dim_cefr --> fact_response
+    dim_scenario --> fact_submission
+    dim_news --> fact_conversation
+    dim_news --> fact_news_engagement
+
+    %% INACTIVE / DO NOT CREATE (dashed) — each closes a loop -> forces a path inactive
+    fact_response -. "submission_id — delete" .-> fact_submission
+    fact_exercise_score -. "exercise_id — delete" .-> fact_response
+    dim_news -. "cefr_level — delete" .-> dim_cefr
+    dim_news -. "language — delete" .-> dim_language
+    dim_news -. "seen_date_key — keep INACTIVE" .-> dim_date
+```
+
+**Active — keep all 18 (solid lines):** every conformed dimension → fact key, single direction.
+
+| Dimension | Active to facts (join key) |
+|---|---|
+| `dim_date` | all 5 facts (`date_key`) |
+| `dim_user` | all 5 facts (`user_id`) |
+| `dim_language` | `fact_submission`, `fact_response`, `fact_conversation` (`language_code`) |
+| `dim_cefr` | `fact_submission`, `fact_response` (`cefr_level`) |
+| `dim_scenario` | `fact_submission` (`scenario_key`) |
+| `dim_news` | `fact_conversation`, `fact_news_engagement` (`news_id`) |
+
+**Inactive or delete (dashed lines) — these are what force you to deactivate:**
+
+| Relationship | Why it breaks | What to do |
+|---|---|---|
+| `fact_response[submission_id]` → `fact_submission` | fact→fact: gives `dim_date`/`dim_user`/… a 2nd path to `fact_response` | **Delete** — don't relate facts to each other |
+| `fact_exercise_score[exercise_id]` → `fact_response` | fact→fact loop through shared dims | **Delete** |
+| `dim_news[cefr_level]` → `dim_cefr` | dim→dim snowflake: 2nd path to the news facts | **Delete** (news CEFR is already an attribute on `dim_news`) |
+| `dim_news[language]` → `dim_language` | dim→dim snowflake loop | **Delete** |
+| `dim_news[seen_date_key]` → `dim_date` | role-playing 2nd date → loop with `date_key` | **Keep INACTIVE**; drive "news by seen date" with `USERELATIONSHIP` |
+
+> **Rule of thumb:** if a relationship is **not** `dimension → fact`, it is the one to make inactive or
+> delete. Keep the star pure (facts touch only dimensions, dimensions never touch each other) and every
+> relationship in the table above stays active — no ambiguity, nothing greyed out. The one legitimate
+> *inactive* relationship is a second date role (`dim_news.seen_date_key`), which you activate on demand
+> inside a measure, e.g.
+> `News by seen date = CALCULATE([News Items], USERELATIONSHIP(dim_news[seen_date_key], dim_date[date_key]))`.
+
 The same relationships work in either storage mode:
 
 - **Direct Lake** (this repo's PBIP) — model built directly on the Gold Lakehouse Delta tables; no

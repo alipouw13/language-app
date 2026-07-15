@@ -327,23 +327,141 @@ denormalized record to OneLake as Delta tables, ready for Power BI:
 The **first score** vs **final (corrected) score** lets you measure improvement after
 correction; `attempts` shows how many tries each exercise took.
 
-### Modeling: Direct Lake vs DirectQuery
+### Modeling: the Gold star schema
 
-The same Delta tables support both storage modes, so you can build two semantic models to
-compare them:
+The Gold layer is already shaped as a **star schema** — 6 dimensions around 5 fact tables. Build
+the semantic model to match this exactly (the repo's TMDL in `fabric/pbip/` already does). Set every
+relationship **1 → many, single cross-filter direction** (dimension → fact):
 
-- **Direct Lake** — create a semantic model directly on the Lakehouse tables. Power BI reads
-  the Delta/Parquet files in OneLake with no import and no query translation (fastest;
-  refresh-free). Relate `worksheet_responses[date_key]` and `worksheet_submissions[date_key]`
-  to `date_dim[date_key]`.
-- **DirectQuery** — connect to the Lakehouse **SQL analytics endpoint** and build the model
-  in DirectQuery mode. Each visual issues T-SQL to the endpoint at query time. Use the same
-  relationships; this is the apples-to-apples comparison to Direct Lake.
+```mermaid
+erDiagram
+    dim_date          ||--o{ fact_submission       : date_key
+    dim_date          ||--o{ fact_response         : date_key
+    dim_date          ||--o{ fact_exercise_score   : date_key
+    dim_date          ||--o{ fact_conversation     : date_key
+    dim_date          ||--o{ fact_news_engagement  : date_key
+    dim_user          ||--o{ fact_submission       : user_id
+    dim_user          ||--o{ fact_response         : user_id
+    dim_user          ||--o{ fact_exercise_score   : user_id
+    dim_user          ||--o{ fact_conversation     : user_id
+    dim_user          ||--o{ fact_news_engagement  : user_id
+    dim_language      ||--o{ fact_submission       : language_code
+    dim_language      ||--o{ fact_response         : language_code
+    dim_language      ||--o{ fact_conversation     : language_code
+    dim_cefr          ||--o{ fact_submission       : cefr_level
+    dim_cefr          ||--o{ fact_response         : cefr_level
+    dim_scenario      ||--o{ fact_submission       : scenario_key
+    dim_news          ||--o{ fact_conversation     : news_id
+    dim_news          ||--o{ fact_news_engagement  : news_id
 
-Suggested model: `date_dim` (1→*) `worksheet_submissions` (1→*) `worksheet_responses`, with
-`date_dim` marked as the date table. Example measures: first-try accuracy
-(`final_correct_count / answered_count`), improvement (`final_score_avg - first_score_avg`),
-and area-of-improvement breakdowns by `exercise_type`, `grammar_focus` or `verb`.
+    dim_date {
+        int64  date_key    PK "hidden key"
+        int64  year
+        int64  month           "sort key for month_name"
+        string month_name      "Sort by column: month"
+        int64  day_of_week      "sort key for day_name"
+        string day_name         "Sort by column: day_of_week"
+        bool   is_weekend
+    }
+    dim_user {
+        string user_id     PK "hidden key"
+        string user_name
+        string native_language
+        bool   is_sample
+    }
+    dim_language {
+        string language_code PK "hidden key"
+        string language_name
+    }
+    dim_cefr {
+        string cefr_level  PK
+        int64  cefr_order      "Sort by column for cefr_level (hidden)"
+    }
+    dim_scenario {
+        string scenario_key PK "hidden key"
+        string scenario_name
+        string mode
+    }
+    dim_news {
+        string news_id     PK "hidden key"
+        string language
+        string cefr_level
+        string domain
+        string title_translated
+    }
+    fact_submission {
+        string submission_id  PK "hidden key"
+        string user_id        FK
+        int64  date_key       FK
+        string language_code  FK
+        string cefr_level     FK
+        string scenario_key   FK
+        double improvement       "measure source (hidden)"
+        double accuracy_first    "measure source (hidden)"
+        double accuracy_final    "measure source (hidden)"
+    }
+    fact_response {
+        string response_id    PK "hidden key"
+        string user_id        FK
+        int64  date_key       FK
+        string language_code  FK
+        string cefr_level     FK
+        string exercise_type     "attribute"
+        bool   first_is_correct  "measure source (hidden)"
+        int64  attempts          "measure source (hidden)"
+    }
+    fact_exercise_score {
+        string id             PK "hidden key"
+        string user_id        FK
+        int64  date_key       FK
+        double score             "measure source (hidden)"
+        bool   is_correct        "measure source (hidden)"
+    }
+    fact_conversation {
+        string id             PK "hidden key"
+        string user_id        FK
+        int64  date_key       FK
+        string language_code  FK
+        string news_id        FK
+        bool   is_news_grounded  "measure source (hidden)"
+        int64  turn_count        "measure source (hidden)"
+        double duration_min      "measure source (hidden)"
+    }
+    fact_news_engagement {
+        string id             PK "hidden key"
+        string user_id        FK
+        int64  date_key       FK
+        string news_id        FK
+        string domain
+        int64  turn_count        "measure source (hidden)"
+        double duration_min      "measure source (hidden)"
+    }
+```
+
+**How to set it up (best practices baked into the repo TMDL):**
+
+1. **Relationships** — one per FK above, **many-to-one, single direction** (dim → fact). Don't set
+   bi-directional filtering; if a scenario needs it, prefer `CROSSFILTER()` in a measure.
+2. **Mark the date table** — set `dim_date` as the model's date table (key `date_key`). Gives you the
+   built-in time-intelligence and a proper date hierarchy.
+3. **Sort by column (fixes the "months are alphabetical" problem)** — `month_name` **Sort by**
+   `month`, `day_name` **Sort by** `day_of_week`, `cefr_level` **Sort by** `cefr_order`.
+4. **Hide keys & raw measure columns** — hide every `*_id`, `*_key`, and numeric measure-source column
+   (e.g. `improvement`, `score`, `attempts`) so report authors pick **measures**, not raw columns.
+5. **Explicit measures only** — turn on *Discourage implicit measures*; author DAX measures
+   (`Submissions`, `First-Try Accuracy`, `News-Grounded %`, …) with `formatString` set. `SUM`-on-a-key
+   should never appear in the field list.
+6. **`summarizeBy: none`** on every column (no accidental aggregation of keys/codes).
+7. **News bridge** — `fact_conversation.news_id` and `fact_news_engagement.news_id` join to `dim_news`;
+   `news_id` is nullable on conversations (not every chat is news-grounded), so a blank member is
+   expected there.
+
+The same relationships work in either storage mode:
+
+- **Direct Lake** (this repo's PBIP) — model built directly on the Gold Lakehouse Delta tables; no
+  import, no query translation, refresh-free.
+- **DirectQuery** — connect to the Gold **SQL analytics endpoint** and build the same relationships in
+  DirectQuery mode for an apples-to-apples comparison. Each visual issues T-SQL at query time.
 
 ## Medallion analytics (Silver → Gold) + sample data
 

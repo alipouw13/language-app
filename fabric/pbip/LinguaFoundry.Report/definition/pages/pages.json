@@ -1,7 +1,10 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
   "pageOrder": [
-    "overview_page"
+    "overview_page",
+    "worksheets_page",
+    "conversations_page",
+    "currentevents_page"
   ],
   "activePageName": "overview_page"
 }

@@ -383,10 +383,10 @@ and example measures are documented in the Gold notebook's closing cell.
 `fabric/pbip/LinguaFoundry.pbip` is a ready-to-open **Power BI Project** (TMDL + enhanced
 **PBIR** report, git-friendly) with a **Direct Lake** semantic model over `LH_LanguageApp_Gold`
 — 11 tables, 18 relationships, and 20 measures (submissions, accuracy/improvement,
-conversations, **News-Grounded %**, etc.). It ships with a **pre-built, purple-themed
-Overview page** (left nav, header, three slicers, five KPI cards, and six charts incl. a
-top-news table) styled with the app's indigo/violet palette (`#4F46E5`→`#8B5CF6`). Authored
-with the Fabric **`semantic-model-authoring`** skill (from the
+conversations, **News-Grounded %**, etc.). It ships with **four purple-themed pages** —
+**Overview**, **Worksheets**, **Conversations**, and **Current events** — each with a left nav,
+header, slicers, KPI cards and charts, styled with the app's indigo/violet palette
+(`#4F46E5`→`#8B5CF6`). Authored with the Fabric **`semantic-model-authoring`** skill (from the
 [skills-for-fabric](https://github.com/microsoft/skills-for-fabric) Copilot plugin).
 
 To use it:

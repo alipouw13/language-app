@@ -655,12 +655,22 @@ Delta tables straight from OneLake, so:
   model isn't embedded locally and there's nothing to write into a `.pbix`.
 - **The Desktop *Publish* button doesn't deploy Direct Lake models.** Publish only pushes a local
   Import/DirectQuery model. Deploy the PBIP the Fabric way instead:
-  1. **Git integration (recommended)** — in the **Language App** workspace: *Workspace settings → Git
-     integration*, connect this repo/branch, then **Update all**. Fabric materializes
-     `fabric/pbip/LinguaFoundry.SemanticModel` and `…Report` as workspace items, wired to the Gold
-     lakehouse. Commits to `main` sync straight into the workspace.
-  2. **Or upload the folder** — *New → Import → Power BI report* (PBIP folder), or use the Fabric REST
-     `POST /v1/workspaces/{wsId}/items` with the definition parts.
+  1. **REST API (surgical, recommended when the workspace already has content)** — create the two
+     items directly, additive, touching nothing else. Create the semantic model from its TMDL parts,
+     then create the report with its `definition.pbir` rewritten from `byPath` to
+     `byConnection` → `{"connectionString": "semanticmodelid=<newModelId>"}` (required for API
+     deploys). Then trigger a `DirectLakeFraming` refresh so visuals load. This repo was deployed to
+     the **Language App** workspace exactly this way (semantic model + report as new `LinguaFoundry`
+     items) — verified returning data via `executeQueries`.
+  2. **Git integration** — connect the workspace to this repo (*Workspace settings → Git integration*),
+     then **Update all**. ⚠️ **Danger on the "What content do you want to sync?" dialog:** if the
+     workspace already has items (it does — 3 lakehouses, Eventhouse, 2 notebooks, `LenguaAnalysis`),
+     **never choose "Sync content from Git into this workspace"** — per Microsoft's docs that
+     *overwrites the workspace and you lose your workspace content*, i.e. it would **delete the
+     lakehouses that hold all the data**. For an already-populated workspace, sync **workspace → Git**
+     first (backs everything up, no data loss), or just use the REST API method above. Pointing the Git
+     folder at `fabric/pbip` (which only has the report items) is what triggers that trap.
+  3. **Or upload the folder** — *New → Import → Power BI report* (PBIP folder).
 - **Want the classic Publish / .pbix flow?** Build an **Import** model instead of Direct Lake
   (*Get data → OneLake / Lakehouse → Import*). That trades live OneLake reads for a scheduled refresh
   but restores *Save as .pbix* and Desktop *Publish*.

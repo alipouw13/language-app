@@ -407,6 +407,18 @@ To use it:
 > (`Language App` / `LH_LanguageApp_Gold`). If you clone into a different workspace, update the
 > two GUIDs in `LinguaFoundry.SemanticModel/definition/expressions.tmdl`.
 
+> **After (re)running the notebooks — sync the SQL endpoint, then refresh the model.** The model
+> uses `directLakeBehavior: directLakeOnly`, so it serves every query from memory (fast) and never
+> silently falls back to DirectQuery. Direct Lake frames tables through the Gold lakehouse's **SQL
+> analytics endpoint**, which lags a minute or two behind Spark-created tables. If visuals show
+> *"table … is not refreshed"* or *"failed to move the data reader"*, the endpoint hasn't synced yet:
+>
+> 1. **Sync the SQL endpoint** — Fabric portal → open `LH_LanguageApp_Gold` → **SQL analytics
+>    endpoint** (it auto-syncs on open), or call the REST API
+>    `POST /v1/workspaces/{wsId}/sqlEndpoints/{sqlEndpointId}/refreshMetadata`.
+> 2. **Refresh the model** — click **Refresh** in Power BI Desktop (this reframes Direct Lake), or
+>    trigger a dataset refresh (`refreshType: DirectLakeFraming`). Then the visuals render.
+
 ### Sample data
 
 Populate every table with realistic, report-ready data (50 `Sample User N`,

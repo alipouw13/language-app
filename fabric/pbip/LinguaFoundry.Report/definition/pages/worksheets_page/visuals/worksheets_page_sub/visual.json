@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "worksheets_page_sub",
   "position": {
     "x": 14,
     "y": 50,
-    "z": 2,
-    "width": 128,
+    "z": 19000,
     "height": 18,
-    "tabOrder": 2
+    "width": 128,
+    "tabOrder": 19000
   },
   "visual": {
     "visualType": "shape",

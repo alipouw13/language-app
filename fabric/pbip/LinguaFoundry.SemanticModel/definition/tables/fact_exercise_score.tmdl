@@ -1,48 +1,74 @@
 table fact_exercise_score
+	lineageTag: 22b122f0-7479-47cb-a2fa-241c5f5c4cb0
+	sourceLineageTag: [dbo].[fact_exercise_score]
 
 	/// Number of standalone answer checks.
 	measure Checks = COUNTROWS(fact_exercise_score)
 		formatString: #,##0
+		lineageTag: 6dd3d238-ee2f-4c89-9dc7-00bc1da5010f
 
 	/// Average score of standalone checks.
 	measure 'Avg Check Score' = AVERAGE(fact_exercise_score[score])
 		formatString: 0.0%
+		lineageTag: 6746a421-2c1c-45f3-a933-b395d9193d8a
 
 	column id
 		dataType: string
-		isHidden
+		lineageTag: 57d6abc5-b308-4223-963b-a2a3f9d59517
+		sourceLineageTag: id
 		summarizeBy: none
 		sourceColumn: id
 
+		annotation SummarizationSetBy = Automatic
+
 	column exercise_id
 		dataType: string
-		isHidden
+		lineageTag: f626d24f-8d99-421a-b6b1-6f241f7a7174
+		sourceLineageTag: exercise_id
 		summarizeBy: none
 		sourceColumn: exercise_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: 1642fdda-9154-47f7-84a5-2da21983af5e
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: 79e87e47-129a-474f-9ff8-bf7ecdb95902
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column score
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 9c3c90f4-2d60-4822-9f83-5e13036b3c1d
+		sourceLineageTag: score
+		summarizeBy: sum
 		sourceColumn: score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column is_correct
 		dataType: boolean
-		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d7fa063f-c846-4816-865e-3e4636cb76c8
+		sourceLineageTag: is_correct
 		summarizeBy: none
 		sourceColumn: is_correct
+
+		annotation SummarizationSetBy = Automatic
 
 	partition fact_exercise_score = entity
 		mode: directLake
@@ -50,3 +76,4 @@ table fact_exercise_score
 			entityName: fact_exercise_score
 			schemaName: dbo
 			expressionSource: DirectLake
+

@@ -1,0 +1,165 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1075.5899973730598,
+            "y": 516
+          },
+          "nodeIndex": "fact_conversation",
+          "nodeLineageTag": "d6583cc6-5ae3-4fc2-a043-76a26468f838",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 659.06396424045374,
+            "y": 534.19520147278661
+          },
+          "nodeIndex": "fact_exercise_score",
+          "nodeLineageTag": "22b122f0-7479-47cb-a2fa-241c5f5c4cb0",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 317.8249720040269,
+            "y": 121.32559937001565
+          },
+          "nodeIndex": "dim_cefr",
+          "nodeLineageTag": "72070716-0f0d-4c3b-b531-88044ecac418",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 968.79707128526275,
+            "y": 38.680685833940856
+          },
+          "nodeIndex": "dim_date",
+          "nodeLineageTag": "170cab1c-760f-4fd8-8cb0-6e64794bc180",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 629.8328433250955,
+            "y": 101
+          },
+          "nodeIndex": "dim_language",
+          "nodeLineageTag": "c8fac109-879f-4d37-b527-b951c92eefc3",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 1590,
+            "y": 43.688453605740506
+          },
+          "nodeIndex": "dim_news",
+          "nodeLineageTag": "e9a63d39-9332-481e-a2ca-015bab62645e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 67.639705159305208
+          },
+          "nodeIndex": "dim_scenario",
+          "nodeLineageTag": "3429eac8-b462-451d-b630-40a252323928",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1312.0576440809323,
+            "y": 75.8602138716617
+          },
+          "nodeIndex": "dim_user",
+          "nodeLineageTag": "08841a69-994e-4dc8-9199-e8fc737706f2",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 1522,
+            "y": 515.40258207438956
+          },
+          "nodeIndex": "fact_news_engagement",
+          "nodeLineageTag": "e35409d7-4cc6-46a6-b30d-b0e437a86535",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 317.79123207627583,
+            "y": 547.0761856828284
+          },
+          "nodeIndex": "fact_response",
+          "nodeLineageTag": "abebe983-5c7b-4961-abe1-807cb08e5640",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 523.41130010758832
+          },
+          "nodeIndex": "fact_submission",
+          "nodeLineageTag": "ebfcca2e-c196-4a83-9aaf-a04086e68190",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 11
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

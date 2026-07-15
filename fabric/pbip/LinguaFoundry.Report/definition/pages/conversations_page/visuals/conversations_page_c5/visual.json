@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_c5",
   "position": {
-    "x": 898,
-    "y": 466,
-    "z": 2,
-    "width": 366,
-    "height": 236,
-    "tabOrder": 2
+    "x": 897.91044776119406,
+    "y": 492.30769230769232,
+    "z": 8000,
+    "height": 209.41446613088405,
+    "width": 365.92422502870266,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -114,5 +114,51 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "0215d83e9493b094b1cd",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_language"
+              }
+            },
+            "Property": "language_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "991f5b718a94e692c5ad",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_conversation"
+              }
+            },
+            "Property": "Conversations"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f858ea411f9b807d6417",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_conversation"
+              }
+            },
+            "Property": "Avg Turns"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

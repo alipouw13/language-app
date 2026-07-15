@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_c5",
   "position": {
-    "x": 898,
-    "y": 466,
-    "z": 2,
-    "width": 366,
-    "height": 236,
-    "tabOrder": 2
+    "x": 897.91044776119406,
+    "y": 484.9598163030999,
+    "z": 8000,
+    "height": 216.76234213547647,
+    "width": 365.92422502870266,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -100,5 +100,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e4eb80ee8e7243923fc6",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_news"
+              }
+            },
+            "Property": "title_translated"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "612925a9651150936291",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_news_engagement"
+              }
+            },
+            "Property": "News Engagements"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

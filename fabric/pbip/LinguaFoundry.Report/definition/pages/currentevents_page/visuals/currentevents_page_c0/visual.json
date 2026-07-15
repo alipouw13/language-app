@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_c0",
   "position": {
-    "x": 166,
-    "y": 232,
-    "z": 2,
-    "width": 356,
-    "height": 218,
-    "tabOrder": 2
+    "x": 166.06199770378876,
+    "y": 257.91044776119406,
+    "z": 3000,
+    "height": 191.77956371986224,
+    "width": 355.63719862227327,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "donutChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_news.language",
               "nativeQueryRef": "language",
-              "displayName": "News language",
-              "active": true
+              "active": true,
+              "displayName": "News language"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "68cf444946f4fd13c8b5",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_news"
+              }
+            },
+            "Property": "language"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d6e3b5b6a89d810cd8af",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_news"
+              }
+            },
+            "Property": "News Items"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

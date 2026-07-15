@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "worksheets_page_c4",
   "position": {
-    "x": 532,
-    "y": 466,
-    "z": 2,
-    "width": 356,
-    "height": 236,
-    "tabOrder": 2
+    "x": 531.98622273249146,
+    "y": 484.9598163030999,
+    "z": 7000,
+    "height": 216.76234213547647,
+    "width": 356.37198622273252,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "fact_response.exercise_type",
               "nativeQueryRef": "exercise_type",
-              "displayName": "Exercise type",
-              "active": true
+              "active": true,
+              "displayName": "Exercise type"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "81062d698e9d8ef142c8",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_response"
+              }
+            },
+            "Property": "exercise_type"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "9344d90b89c0547de3a5",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_response"
+              }
+            },
+            "Property": "Avg Attempts"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

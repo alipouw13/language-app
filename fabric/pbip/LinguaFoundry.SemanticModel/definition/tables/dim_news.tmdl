@@ -1,55 +1,93 @@
 table dim_news
+	lineageTag: e9a63d39-9332-481e-a2ca-015bab62645e
+	sourceLineageTag: [dbo].[dim_news]
 
 	/// Distinct enriched news items.
 	measure 'News Items' = DISTINCTCOUNT(dim_news[news_id])
 		formatString: #,##0
+		lineageTag: 64c2760c-71e3-4c6a-bfa3-d4d342f444ab
 
 	column news_id
 		dataType: string
-		isHidden
+		lineageTag: 0779a392-c41d-4807-bf05-7cbd36e6333a
+		sourceLineageTag: news_id
 		summarizeBy: none
 		sourceColumn: news_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column language
 		dataType: string
+		lineageTag: 0d8d6eaa-075d-4c6e-b8ba-496a19c78890
+		sourceLineageTag: language
 		summarizeBy: none
 		sourceColumn: language
 
+		annotation SummarizationSetBy = Automatic
+
 	column cefr_level
 		dataType: string
+		lineageTag: f5d7b72b-4cb9-41d3-8980-27c88a494083
+		sourceLineageTag: cefr_level
 		summarizeBy: none
 		sourceColumn: cefr_level
 
+		annotation SummarizationSetBy = Automatic
+
 	column domain
 		dataType: string
+		lineageTag: f8b4725d-8bcd-4ff9-a672-0de5b3a9dd56
+		sourceLineageTag: domain
 		summarizeBy: none
 		sourceColumn: domain
 
+		annotation SummarizationSetBy = Automatic
+
 	column source_country
 		dataType: string
+		lineageTag: 3f96bf32-4cef-4c76-aa2e-c4ce2ddc5bb8
+		sourceLineageTag: source_country
 		summarizeBy: none
 		sourceColumn: source_country
 
+		annotation SummarizationSetBy = Automatic
+
 	column title_translated
 		dataType: string
+		lineageTag: 90121000-3721-4c71-a865-6fc13d7209b2
+		sourceLineageTag: title_translated
 		summarizeBy: none
 		sourceColumn: title_translated
 
+		annotation SummarizationSetBy = Automatic
+
 	column summary
 		dataType: string
+		lineageTag: b6785490-f2a4-46fa-bec7-2c3424993434
+		sourceLineageTag: summary
 		summarizeBy: none
 		sourceColumn: summary
 
+		annotation SummarizationSetBy = Automatic
+
 	column english_gloss
 		dataType: string
+		lineageTag: f9bf0151-d66a-438d-bf5a-e44f64439c0e
+		sourceLineageTag: english_gloss
 		summarizeBy: none
 		sourceColumn: english_gloss
 
+		annotation SummarizationSetBy = Automatic
+
 	column seen_date_key
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 44c4cd81-95db-4eff-84ee-c08fd43f6bfd
+		sourceLineageTag: seen_date_key
+		summarizeBy: sum
 		sourceColumn: seen_date_key
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_news = entity
 		mode: directLake
@@ -57,3 +95,4 @@ table dim_news
 			entityName: dim_news
 			schemaName: dbo
 			expressionSource: DirectLake
+

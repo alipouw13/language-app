@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "worksheets_page_c2",
   "position": {
-    "x": 898,
-    "y": 232,
-    "z": 2,
-    "width": 366,
-    "height": 218,
-    "tabOrder": 2
+    "x": 897.91044776119406,
+    "y": 257.91044776119406,
+    "z": 5000,
+    "height": 191.77956371986224,
+    "width": 365.92422502870266,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "donutChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_language.language_name",
               "nativeQueryRef": "language_name",
-              "displayName": "Language",
-              "active": true
+              "active": true,
+              "displayName": "Language"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "782c8ef2ab5c47487094",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_language"
+              }
+            },
+            "Property": "language_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "64ad3e76ddc50a9899ff",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_submission"
+              }
+            },
+            "Property": "Submissions"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

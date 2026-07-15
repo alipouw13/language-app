@@ -8,6 +8,12 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
+annotation PBI_ProTooling = ["RemoteModeling","DevMode"]
+
+annotation PBI_QueryOrder = ["DirectLake"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
 ref table dim_user
 ref table dim_date
 ref table dim_language
@@ -19,3 +25,4 @@ ref table fact_response
 ref table fact_exercise_score
 ref table fact_conversation
 ref table fact_news_engagement
+

@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_c0_t",
   "position": {
-    "x": 176,
-    "y": 238,
-    "z": 4,
-    "width": 340,
-    "height": 26,
-    "tabOrder": 4
+    "x": 166.06199770378876,
+    "y": 232.19288174512056,
+    "z": 19000,
+    "height": 25.71756601607348,
+    "width": 339.47187141216995,
+    "tabOrder": 19000
   },
   "visual": {
     "visualType": "shape",

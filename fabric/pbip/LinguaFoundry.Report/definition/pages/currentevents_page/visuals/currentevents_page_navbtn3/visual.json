@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_navbtn3",
   "position": {
     "x": 8,
     "y": 224,
-    "z": 6,
-    "width": 134,
+    "z": 27000,
     "height": 34,
-    "tabOrder": 6
+    "width": 134,
+    "tabOrder": 27000
   },
   "visual": {
     "visualType": "actionButton",

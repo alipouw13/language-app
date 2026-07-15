@@ -1,20 +1,33 @@
 table dim_scenario
-
-	column scenario_key
-		dataType: string
-		isHidden
-		summarizeBy: none
-		sourceColumn: scenario_key
+	lineageTag: 3429eac8-b462-451d-b630-40a252323928
+	sourceLineageTag: [dbo].[dim_scenario]
 
 	column scenario_name
 		dataType: string
+		lineageTag: 7f44bf66-577f-4745-8c22-36c5bdf0a799
+		sourceLineageTag: scenario_name
 		summarizeBy: none
 		sourceColumn: scenario_name
 
+		annotation SummarizationSetBy = Automatic
+
 	column mode
 		dataType: string
+		lineageTag: f903ac11-b7d8-4455-ab86-76f06fe1e345
+		sourceLineageTag: mode
 		summarizeBy: none
 		sourceColumn: mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column scenario_key
+		dataType: string
+		lineageTag: bb4adeaf-c4cf-4a25-bc0e-11118ba37bd5
+		sourceLineageTag: scenario_key
+		summarizeBy: none
+		sourceColumn: scenario_key
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_scenario = entity
 		mode: directLake
@@ -22,3 +35,4 @@ table dim_scenario
 			entityName: dim_scenario
 			schemaName: dbo
 			expressionSource: DirectLake
+

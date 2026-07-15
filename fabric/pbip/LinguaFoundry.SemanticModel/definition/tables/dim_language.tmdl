@@ -1,15 +1,24 @@
 table dim_language
+	lineageTag: c8fac109-879f-4d37-b527-b951c92eefc3
+	sourceLineageTag: [dbo].[dim_language]
 
 	column language_code
 		dataType: string
-		isHidden
+		lineageTag: 5a39f953-1d21-4059-8162-e24210a1da44
+		sourceLineageTag: language_code
 		summarizeBy: none
 		sourceColumn: language_code
 
+		annotation SummarizationSetBy = Automatic
+
 	column language_name
 		dataType: string
+		lineageTag: 623bd4c1-7d63-4570-b578-25b13fd95418
+		sourceLineageTag: language_name
 		summarizeBy: none
 		sourceColumn: language_name
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_language = entity
 		mode: directLake
@@ -17,3 +26,4 @@ table dim_language
 			entityName: dim_language
 			schemaName: dbo
 			expressionSource: DirectLake
+

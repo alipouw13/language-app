@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_nav1",
   "position": {
     "x": 8,
     "y": 144,
-    "z": 2,
-    "width": 134,
+    "z": 13000,
     "height": 34,
-    "tabOrder": 2
+    "width": 134,
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "shape",
@@ -68,7 +68,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'\u25cb   Worksheets'"
+                  "Value": "'○   Worksheets'"
                 }
               }
             },

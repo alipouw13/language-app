@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_c1",
   "position": {
-    "x": 532,
-    "y": 232,
-    "z": 2,
-    "width": 356,
-    "height": 218,
-    "tabOrder": 2
+    "x": 531.98622273249146,
+    "y": 270.40183696900118,
+    "z": 4000,
+    "height": 179.28817451205512,
+    "width": 356.37198622273252,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "donutChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_language.language_name",
               "nativeQueryRef": "language_name",
-              "displayName": "Language",
-              "active": true
+              "active": true,
+              "displayName": "Language"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "3e865c2c0486988e2478",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_language"
+              }
+            },
+            "Property": "language_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "4cfc6b844f74ae4c29a3",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_conversation"
+              }
+            },
+            "Property": "Conversations"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

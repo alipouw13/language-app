@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_c3",
   "position": {
-    "x": 166,
-    "y": 466,
-    "z": 2,
-    "width": 356,
-    "height": 236,
-    "tabOrder": 2
+    "x": 166.06199770378876,
+    "y": 484.9598163030999,
+    "z": 6000,
+    "height": 216.76234213547647,
+    "width": 355.63719862227327,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "fact_response.exercise_type",
               "nativeQueryRef": "exercise_type",
-              "displayName": "Exercise type",
-              "active": true
+              "active": true,
+              "displayName": "Exercise type"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "2264a161d74b6fb7a902",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_response"
+              }
+            },
+            "Property": "exercise_type"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "936920f4244c2c313f9e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_response"
+              }
+            },
+            "Property": "First-Correct %"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_c1",
   "position": {
-    "x": 532,
-    "y": 232,
-    "z": 2,
-    "width": 356,
-    "height": 218,
-    "tabOrder": 2
+    "x": 531.98622273249146,
+    "y": 263.788748564868,
+    "z": 4000,
+    "height": 185.9012629161883,
+    "width": 356.37198622273252,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_scenario.scenario_name",
               "nativeQueryRef": "scenario_name",
-              "displayName": "Scenario",
-              "active": true
+              "active": true,
+              "displayName": "Scenario"
             }
           ]
         },
@@ -105,5 +105,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "dd020393a5489130f09b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_scenario"
+              }
+            },
+            "Property": "scenario_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "fb13a161a7f562c61e07",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_submission"
+              }
+            },
+            "Property": "Submissions"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

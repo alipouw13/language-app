@@ -1,71 +1,72 @@
-relationship rel_01_fact_submission_dim_user
-	fromColumn: fact_submission.user_id
-	toColumn: dim_user.user_id
+relationship 0b455145-1588-69f1-5637-9fef13a9e8d3
+	fromColumn: fact_news_engagement.news_id
+	toColumn: dim_news.news_id
 
-relationship rel_02_fact_submission_dim_date
-	fromColumn: fact_submission.date_key
-	toColumn: dim_date.date_key
-
-relationship rel_03_fact_response_dim_user
-	fromColumn: fact_response.user_id
-	toColumn: dim_user.user_id
-
-relationship rel_04_fact_response_dim_date
-	fromColumn: fact_response.date_key
-	toColumn: dim_date.date_key
-
-relationship rel_05_fact_exercise_score_dim_user
-	fromColumn: fact_exercise_score.user_id
-	toColumn: dim_user.user_id
-
-relationship rel_06_fact_exercise_score_dim_date
-	fromColumn: fact_exercise_score.date_key
-	toColumn: dim_date.date_key
-
-relationship rel_07_fact_conversation_dim_user
+relationship d2cb2c7c-f50f-a424-fcff-037f9df66fea
 	fromColumn: fact_conversation.user_id
 	toColumn: dim_user.user_id
 
-relationship rel_08_fact_conversation_dim_date
-	fromColumn: fact_conversation.date_key
+relationship 151d7d35-ec7f-d10c-3221-b0af6e34e4ff
+	fromColumn: fact_exercise_score.date_key
 	toColumn: dim_date.date_key
 
-relationship rel_09_fact_news_engagement_dim_user
-	fromColumn: fact_news_engagement.user_id
-	toColumn: dim_user.user_id
-
-relationship rel_10_fact_news_engagement_dim_date
-	fromColumn: fact_news_engagement.date_key
+relationship e20e3b79-6ffe-792f-c86e-c44e76b17408
+	fromColumn: fact_response.date_key
 	toColumn: dim_date.date_key
 
-relationship rel_11_fact_submission_dim_language
-	fromColumn: fact_submission.language_code
-	toColumn: dim_language.language_code
+relationship 2ac089ff-c6fc-141a-2b55-1a33a7ce79f8
+	fromColumn: fact_submission.date_key
+	toColumn: dim_date.date_key
 
-relationship rel_12_fact_response_dim_language
-	fromColumn: fact_response.language_code
-	toColumn: dim_language.language_code
-
-relationship rel_13_fact_conversation_dim_language
-	fromColumn: fact_conversation.language_code
-	toColumn: dim_language.language_code
-
-relationship rel_14_fact_submission_dim_cefr
+relationship d4f61b2f-a95e-48e6-d3cf-dc1970ef8ad4
 	fromColumn: fact_submission.cefr_level
 	toColumn: dim_cefr.cefr_level
 
-relationship rel_15_fact_response_dim_cefr
-	fromColumn: fact_response.cefr_level
-	toColumn: dim_cefr.cefr_level
-
-relationship rel_16_fact_submission_dim_scenario
+relationship 8d948711-3e2a-1bc3-8bf4-2582619a661f
 	fromColumn: fact_submission.scenario_key
 	toColumn: dim_scenario.scenario_key
 
-relationship rel_17_fact_conversation_dim_news
+relationship 9b575f74-1070-97d0-0812-0b6e6f6a4b17
+	fromColumn: fact_conversation.language_code
+	toColumn: dim_language.language_code
+
+relationship 8aeca1e8-4d42-f4f9-9c01-14f3a70e4fac
+	fromColumn: fact_submission.language_code
+	toColumn: dim_language.language_code
+
+relationship 2d6c6d59-254a-cb8d-adc8-71f8bdf9fe1f
+	fromColumn: fact_response.user_id
+	toColumn: dim_user.user_id
+
+relationship 187403f1-d3c1-75cd-64a5-9dbf3df3b5dd
+	fromColumn: fact_submission.user_id
+	toColumn: dim_user.user_id
+
+relationship 5a01307e-ea93-b3bb-2a64-9cd6092bce65
+	fromColumn: fact_exercise_score.user_id
+	toColumn: dim_user.user_id
+
+relationship 4a00ae33-151f-d1f5-12fc-dff04e490362
+	fromColumn: fact_news_engagement.user_id
+	toColumn: dim_user.user_id
+
+relationship 29b9c14c-b41a-920b-a7fd-cbe03b025618
 	fromColumn: fact_conversation.news_id
 	toColumn: dim_news.news_id
 
-relationship rel_18_fact_news_engagement_dim_news
-	fromColumn: fact_news_engagement.news_id
-	toColumn: dim_news.news_id
+relationship 194e5258-6d49-2d02-1ac9-212de2bc25a6
+	fromColumn: fact_response.cefr_level
+	toColumn: dim_cefr.cefr_level
+
+relationship 248532e6-d16a-c6a3-a893-3be8ab2a2b15
+	fromColumn: fact_response.language_code
+	toColumn: dim_language.language_code
+
+relationship b8dea91c-dd38-c275-2a1b-d82c9a13df6f
+	fromColumn: fact_conversation.date_key
+	toColumn: dim_date.date_key
+
+relationship 89943025-c3ed-111d-0e6b-41e4782c846a
+	fromColumn: fact_news_engagement.date_key
+	toColumn: dim_date.date_key
+

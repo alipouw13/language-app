@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_c2_t",
   "position": {
-    "x": 908,
-    "y": 238,
-    "z": 4,
-    "width": 350,
-    "height": 26,
-    "tabOrder": 4
+    "x": 897.91044776119406,
+    "y": 232.19288174512056,
+    "z": 24000,
+    "height": 25.71756601607348,
+    "width": 349.75889781859934,
+    "tabOrder": 24000
   },
   "visual": {
     "visualType": "shape",

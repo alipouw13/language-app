@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_kpi0",
   "position": {
     "x": 166,
     "y": 128,
-    "z": 2,
-    "width": 206,
+    "z": 10000,
     "height": 96,
-    "tabOrder": 2
+    "width": 206,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "card",
@@ -67,5 +67,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "66c438edb9097459c501",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_submission"
+              }
+            },
+            "Property": "Submissions"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

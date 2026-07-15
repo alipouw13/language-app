@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_navbtn1",
   "position": {
     "x": 8,
     "y": 144,
-    "z": 6,
-    "width": 134,
+    "z": 30000,
     "height": 34,
-    "tabOrder": 6
+    "width": 134,
+    "tabOrder": 30000
   },
   "visual": {
     "visualType": "actionButton",

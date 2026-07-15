@@ -1,35 +1,58 @@
 table dim_user
+	lineageTag: 08841a69-994e-4dc8-9199-e8fc737706f2
+	sourceLineageTag: [dbo].[dim_user]
 
 	/// Distinct learners in context.
 	measure Learners = DISTINCTCOUNT(dim_user[user_id])
 		formatString: #,##0
+		lineageTag: 0c17d232-0758-4b8a-a2ab-394a352b0240
 
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: 033a9ed4-ee6d-4c87-90c0-d115499f3bd2
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_name
 		dataType: string
+		lineageTag: 63f893eb-0a47-4a6a-b639-1fdbc3a652a8
+		sourceLineageTag: user_name
 		summarizeBy: none
 		sourceColumn: user_name
 
+		annotation SummarizationSetBy = Automatic
+
 	column native_language
 		dataType: string
+		lineageTag: f406cd1a-a28d-4f8e-ba15-bd82f6ba7b35
+		sourceLineageTag: native_language
 		summarizeBy: none
 		sourceColumn: native_language
 
+		annotation SummarizationSetBy = Automatic
+
 	column created_date_key
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 9e02bcd6-f252-4185-a034-64505ea138a7
+		sourceLineageTag: created_date_key
+		summarizeBy: sum
 		sourceColumn: created_date_key
+
+		annotation SummarizationSetBy = Automatic
 
 	column is_sample
 		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 84b37605-a405-4a72-9742-0d3f28d7c7d3
+		sourceLineageTag: is_sample
 		summarizeBy: none
 		sourceColumn: is_sample
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_user = entity
 		mode: directLake
@@ -37,3 +60,4 @@ table dim_user
 			entityName: dim_user
 			schemaName: dbo
 			expressionSource: DirectLake
+

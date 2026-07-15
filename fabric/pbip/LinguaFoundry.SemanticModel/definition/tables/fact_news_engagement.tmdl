@@ -1,59 +1,96 @@
 table fact_news_engagement
+	lineageTag: e35409d7-4cc6-46a6-b30d-b0e437a86535
+	sourceLineageTag: [dbo].[fact_news_engagement]
 
 	/// News-grounded conversation x news rows.
 	measure 'News Engagements' = COUNTROWS(fact_news_engagement)
 		formatString: #,##0
+		lineageTag: b4d6155c-2a4b-43dc-be88-70bf655e33e0
 
 	column id
 		dataType: string
-		isHidden
+		lineageTag: 0b4cfc10-0bf8-4421-823f-5ae603805152
+		sourceLineageTag: id
 		summarizeBy: none
 		sourceColumn: id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: 20965d8e-16cb-4842-9c36-876f8379339f
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: 1a0fc7a6-abac-4d92-95ec-e784012f9b24
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column news_id
 		dataType: string
-		isHidden
+		lineageTag: d48c3858-d7a8-4ae9-b78b-ffe54218d40b
+		sourceLineageTag: news_id
 		summarizeBy: none
 		sourceColumn: news_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column news_language
 		dataType: string
+		lineageTag: d5bfa7c5-8526-4c70-9350-55e53610ffac
+		sourceLineageTag: news_language
 		summarizeBy: none
 		sourceColumn: news_language
 
+		annotation SummarizationSetBy = Automatic
+
 	column news_cefr
 		dataType: string
+		lineageTag: a22769ef-c932-447c-b2a4-65fbe12d5960
+		sourceLineageTag: news_cefr
 		summarizeBy: none
 		sourceColumn: news_cefr
 
+		annotation SummarizationSetBy = Automatic
+
 	column domain
 		dataType: string
+		lineageTag: 326d5d02-fb92-4db9-9954-04516a70f226
+		sourceLineageTag: domain
 		summarizeBy: none
 		sourceColumn: domain
 
+		annotation SummarizationSetBy = Automatic
+
 	column turn_count
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 64adc0de-876b-4e3f-8116-d3d236fb1a46
+		sourceLineageTag: turn_count
+		summarizeBy: sum
 		sourceColumn: turn_count
+
+		annotation SummarizationSetBy = Automatic
 
 	column duration_min
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: b5a414fc-c963-433b-9aa9-a9b2a88948db
+		sourceLineageTag: duration_min
+		summarizeBy: sum
 		sourceColumn: duration_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition fact_news_engagement = entity
 		mode: directLake
@@ -61,3 +98,4 @@ table fact_news_engagement
 			entityName: fact_news_engagement
 			schemaName: dbo
 			expressionSource: DirectLake
+

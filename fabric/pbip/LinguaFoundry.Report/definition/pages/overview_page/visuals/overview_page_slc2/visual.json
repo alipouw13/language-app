@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_slc2",
   "position": {
     "x": 602,
     "y": 64,
-    "z": 3,
-    "width": 206,
+    "z": 22000,
     "height": 56,
-    "tabOrder": 3
+    "width": 206,
+    "tabOrder": 22000
   },
   "visual": {
     "visualType": "slicer",
@@ -28,11 +28,27 @@
               },
               "queryRef": "dim_date.year",
               "nativeQueryRef": "year",
+              "active": true,
               "displayName": "Year"
             }
           ]
         }
       }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "visualContainerObjects": {
       "background": [
@@ -68,5 +84,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "d4e7f56e694cbd614773",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_date"
+              }
+            },
+            "Property": "year"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

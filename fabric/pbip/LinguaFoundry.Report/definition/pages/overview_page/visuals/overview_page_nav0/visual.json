@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_nav0",
   "position": {
     "x": 8,
     "y": 104,
-    "z": 2,
-    "width": 134,
+    "z": 15000,
     "height": 34,
-    "tabOrder": 2
+    "width": 134,
+    "tabOrder": 15000
   },
   "visual": {
     "visualType": "shape",
@@ -75,7 +75,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'\u25a0   Overview'"
+                  "Value": "'■   Overview'"
                 }
               }
             },

@@ -1,84 +1,128 @@
 table fact_conversation
+	lineageTag: d6583cc6-5ae3-4fc2-a043-76a26468f838
+	sourceLineageTag: [dbo].[fact_conversation]
 
 	/// Number of conversation sessions.
 	measure Conversations = COUNTROWS(fact_conversation)
 		formatString: #,##0
+		lineageTag: e45048da-5796-427d-899d-bd6844dcb00a
 
 	/// Average turns per conversation.
 	measure 'Avg Turns' = AVERAGE(fact_conversation[turn_count])
 		formatString: 0.0
+		lineageTag: afd3139a-1357-4d9d-b0b3-d18370b746a6
 
 	/// Average conversation duration in minutes.
 	measure 'Avg Minutes' = AVERAGE(fact_conversation[duration_min])
 		formatString: 0.0
+		lineageTag: e7719b11-cac6-4785-a388-bd437451de91
 
 	/// Conversations grounded in a real news item.
 	measure 'News-Grounded Chats' = CALCULATE(COUNTROWS(fact_conversation), fact_conversation[is_news_grounded] = TRUE())
 		formatString: #,##0
+		lineageTag: 64658af8-0f6e-4137-a41d-3237cbefe0d9
 
 	/// Share of conversations grounded in news.
 	measure 'News-Grounded %' = DIVIDE([News-Grounded Chats], [Conversations])
 		formatString: 0.0%
+		lineageTag: 63a18f6e-9f47-4adf-bbc9-7c0c6788435a
 
 	column id
 		dataType: string
-		isHidden
+		lineageTag: 8baadae2-d4eb-4aa0-8082-2ffc5d9b7a0d
+		sourceLineageTag: id
 		summarizeBy: none
 		sourceColumn: id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: a422142a-4e5e-4b9c-a98e-95a74eb2ecb3
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: ea5620c7-1b2c-4510-a013-116c704ee260
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column language_code
 		dataType: string
-		isHidden
+		lineageTag: a30d9f26-3c9f-48b7-8214-2214cfdf3e89
+		sourceLineageTag: language_code
 		summarizeBy: none
 		sourceColumn: language_code
 
+		annotation SummarizationSetBy = Automatic
+
 	column news_id
 		dataType: string
-		isHidden
+		lineageTag: fec8d35e-f578-4e15-8c34-c4bd285347a6
+		sourceLineageTag: news_id
 		summarizeBy: none
 		sourceColumn: news_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column is_news_grounded
 		dataType: boolean
-		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a14e1ab7-d624-4d45-ab70-a4e61acc1713
+		sourceLineageTag: is_news_grounded
 		summarizeBy: none
 		sourceColumn: is_news_grounded
 
+		annotation SummarizationSetBy = Automatic
+
 	column turn_count
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: bbbd9320-4514-4fc1-ad67-2e469168e6cd
+		sourceLineageTag: turn_count
+		summarizeBy: sum
 		sourceColumn: turn_count
+
+		annotation SummarizationSetBy = Automatic
 
 	column user_turns
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: dd4e3f9e-e84f-4942-8c5f-4f0a1a146ac2
+		sourceLineageTag: user_turns
+		summarizeBy: sum
 		sourceColumn: user_turns
+
+		annotation SummarizationSetBy = Automatic
 
 	column corrected_turns
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 28a8ba95-4134-4d31-8609-b9296414ba0f
+		sourceLineageTag: corrected_turns
+		summarizeBy: sum
 		sourceColumn: corrected_turns
+
+		annotation SummarizationSetBy = Automatic
 
 	column duration_min
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 8e381f5a-350d-4af7-b0af-406d95683497
+		sourceLineageTag: duration_min
+		summarizeBy: sum
 		sourceColumn: duration_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition fact_conversation = entity
 		mode: directLake
@@ -86,3 +130,4 @@ table fact_conversation
 			entityName: fact_conversation
 			schemaName: dbo
 			expressionSource: DirectLake
+

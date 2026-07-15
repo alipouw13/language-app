@@ -1,16 +1,25 @@
 table dim_cefr
+	lineageTag: 72070716-0f0d-4c3b-b531-88044ecac418
+	sourceLineageTag: [dbo].[dim_cefr]
 
 	column cefr_level
 		dataType: string
+		lineageTag: fe5ab38e-5ffc-449b-8582-6de6b2898162
+		sourceLineageTag: cefr_level
 		summarizeBy: none
 		sourceColumn: cefr_level
-		sortByColumn: cefr_order
+
+		annotation SummarizationSetBy = Automatic
 
 	column cefr_order
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: c794cd3b-2fc2-4c8a-8018-de65f750479d
+		sourceLineageTag: cefr_order
+		summarizeBy: sum
 		sourceColumn: cefr_order
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_cefr = entity
 		mode: directLake
@@ -18,3 +27,4 @@ table dim_cefr
 			entityName: dim_cefr
 			schemaName: dbo
 			expressionSource: DirectLake
+

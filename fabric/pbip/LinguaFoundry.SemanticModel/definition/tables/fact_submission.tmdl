@@ -1,150 +1,246 @@
 table fact_submission
+	lineageTag: ebfcca2e-c196-4a83-9aaf-a04086e68190
+	sourceLineageTag: [dbo].[fact_submission]
 
 	/// Number of submitted worksheets.
 	measure Submissions = COUNTROWS(fact_submission)
 		formatString: #,##0
+		lineageTag: 09a9dea7-4c9d-47e0-b0b7-55cf6978ac95
 
 	/// Average first-attempt score across submissions.
 	measure 'Avg First Score' = AVERAGE(fact_submission[first_score_avg])
 		formatString: 0.0%
+		lineageTag: f7049257-f790-4997-b427-9a42340db1ec
 
 	/// Average corrected score across submissions.
 	measure 'Avg Final Score' = AVERAGE(fact_submission[final_score_avg])
 		formatString: 0.0%
+		lineageTag: 35b40d83-07ac-49ba-b780-da8e1ad0db9c
 
 	/// Average lift from first to final score.
 	measure 'Avg Improvement' = AVERAGE(fact_submission[improvement])
 		formatString: 0.0%
+		lineageTag: b111c94b-6efd-4929-840d-e74727c338f2
 
 	/// Share of answered exercises correct on first try.
 	measure 'First-Try Accuracy' = AVERAGE(fact_submission[accuracy_first])
 		formatString: 0.0%
+		lineageTag: 717a0b9b-d296-4711-9e3a-ea09381315a3
 
 	/// Share of answered exercises correct after correction.
 	measure 'Final Accuracy' = AVERAGE(fact_submission[accuracy_final])
 		formatString: 0.0%
+		lineageTag: 0d82679a-89b8-41a2-9bf0-c3417646b4fc
 
 	/// Total exercises across submissions.
 	measure 'Total Exercises' = SUM(fact_submission[total_exercises])
 		formatString: #,##0
+		lineageTag: bd2caae5-afef-416d-95c1-eab3f8f4d48d
 
 	column submission_id
 		dataType: string
-		isHidden
+		lineageTag: 4ece11f6-f6e6-4ed5-892d-b48e5965f98e
+		sourceLineageTag: submission_id
 		summarizeBy: none
 		sourceColumn: submission_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column lesson_id
 		dataType: string
-		isHidden
+		lineageTag: f731c7d6-6347-4473-8d79-c8b5cc24ff56
+		sourceLineageTag: lesson_id
 		summarizeBy: none
 		sourceColumn: lesson_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: 751fcf73-a993-4dee-864d-0fcfbf537acc
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: 384ccd11-1cf3-466d-931e-dff2594e8555
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column language_code
 		dataType: string
-		isHidden
+		lineageTag: 9cf24f90-2ed7-4051-83e4-e593142ca950
+		sourceLineageTag: language_code
 		summarizeBy: none
 		sourceColumn: language_code
 
+		annotation SummarizationSetBy = Automatic
+
 	column cefr_level
 		dataType: string
-		isHidden
+		lineageTag: faabc503-b718-4beb-8b44-d88776b0dfad
+		sourceLineageTag: cefr_level
 		summarizeBy: none
 		sourceColumn: cefr_level
 
-	column scenario_key
+		annotation SummarizationSetBy = Automatic
+
+	column scenario_name
 		dataType: string
-		isHidden
+		lineageTag: f2a04a1a-23ed-4202-ba03-3638c069e7a8
+		sourceLineageTag: scenario_name
 		summarizeBy: none
-		sourceColumn: scenario_key
+		sourceColumn: scenario_name
+
+		annotation SummarizationSetBy = Automatic
 
 	column mode
 		dataType: string
-		isHidden
+		lineageTag: c1d29285-3072-4bdb-b1bd-46abda0eeb40
+		sourceLineageTag: mode
 		summarizeBy: none
 		sourceColumn: mode
 
+		annotation SummarizationSetBy = Automatic
+
 	column verb
 		dataType: string
+		lineageTag: ee777f24-fa99-49fc-8751-6341730c9b73
+		sourceLineageTag: verb
 		summarizeBy: none
 		sourceColumn: verb
 
+		annotation SummarizationSetBy = Automatic
+
 	column grammar_focus
 		dataType: string
+		lineageTag: 07891210-1bfc-4c5d-8c27-8be888745019
+		sourceLineageTag: grammar_focus
 		summarizeBy: none
 		sourceColumn: grammar_focus
 
+		annotation SummarizationSetBy = Automatic
+
 	column total_exercises
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: a52e0a76-1c7a-4b38-b87b-d3ed08111d07
+		sourceLineageTag: total_exercises
+		summarizeBy: sum
 		sourceColumn: total_exercises
+
+		annotation SummarizationSetBy = Automatic
 
 	column answered_count
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 4c6e1516-dd97-4549-aaf5-08b95f50dd46
+		sourceLineageTag: answered_count
+		summarizeBy: sum
 		sourceColumn: answered_count
+
+		annotation SummarizationSetBy = Automatic
 
 	column first_correct_count
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 79eefcee-f942-41ac-80d6-e2e05b352320
+		sourceLineageTag: first_correct_count
+		summarizeBy: sum
 		sourceColumn: first_correct_count
+
+		annotation SummarizationSetBy = Automatic
 
 	column final_correct_count
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: dc315935-f06e-41e2-ac6e-53c180bfe80f
+		sourceLineageTag: final_correct_count
+		summarizeBy: sum
 		sourceColumn: final_correct_count
+
+		annotation SummarizationSetBy = Automatic
 
 	column first_score_avg
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 6c4c63ae-b256-4b38-bcda-d3a4b7d3c109
+		sourceLineageTag: first_score_avg
+		summarizeBy: sum
 		sourceColumn: first_score_avg
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column final_score_avg
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: ea376ead-ffdb-4a37-b4ac-34acee11269a
+		sourceLineageTag: final_score_avg
+		summarizeBy: sum
 		sourceColumn: final_score_avg
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column improvement
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 58d9e02e-5065-4491-9689-90dcb09444e2
+		sourceLineageTag: improvement
+		summarizeBy: sum
 		sourceColumn: improvement
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column accuracy_first
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: d3805786-5cb8-4d78-8185-9957d46ceeaa
+		sourceLineageTag: accuracy_first
+		summarizeBy: sum
 		sourceColumn: accuracy_first
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column accuracy_final
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: c84c68e3-b548-4e8e-b813-73ec69690a48
+		sourceLineageTag: accuracy_final
+		summarizeBy: sum
 		sourceColumn: accuracy_final
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column submitted_ts
 		dataType: dateTime
-		isHidden
+		formatString: General Date
+		lineageTag: cfee9e6f-8bf1-46b7-88d7-b2fe7ce4d535
+		sourceLineageTag: submitted_ts
 		summarizeBy: none
 		sourceColumn: submitted_ts
+
+		annotation SummarizationSetBy = Automatic
+
+	column scenario_key
+		dataType: string
+		lineageTag: a5bfe80a-cf24-44be-b38b-dc84ad51c6b0
+		sourceLineageTag: scenario_key
+		summarizeBy: none
+		sourceColumn: scenario_key
+
+		annotation SummarizationSetBy = Automatic
 
 	partition fact_submission = entity
 		mode: directLake
@@ -152,3 +248,4 @@ table fact_submission
 			entityName: fact_submission
 			schemaName: dbo
 			expressionSource: DirectLake
+

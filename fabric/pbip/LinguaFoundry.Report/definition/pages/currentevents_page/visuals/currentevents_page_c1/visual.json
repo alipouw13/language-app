@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_c1",
   "position": {
-    "x": 532,
-    "y": 232,
-    "z": 2,
-    "width": 356,
-    "height": 218,
-    "tabOrder": 2
+    "x": 531.98622273249146,
+    "y": 257.91044776119406,
+    "z": 4000,
+    "height": 191.77956371986224,
+    "width": 356.37198622273252,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_news.cefr_level",
               "nativeQueryRef": "cefr_level",
-              "displayName": "CEFR level",
-              "active": true
+              "active": true,
+              "displayName": "CEFR level"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "050c35cf4804629f79a1",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_news"
+              }
+            },
+            "Property": "cefr_level"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "de128c344e78ba55eab7",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_news"
+              }
+            },
+            "Property": "News Items"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

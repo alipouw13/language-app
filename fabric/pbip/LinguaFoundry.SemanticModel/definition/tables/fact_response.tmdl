@@ -1,93 +1,146 @@
 table fact_response
+	lineageTag: abebe983-5c7b-4961-abe1-807cb08e5640
+	sourceLineageTag: [dbo].[fact_response]
 
 	/// Number of exercise responses.
 	measure Responses = COUNTROWS(fact_response)
 		formatString: #,##0
+		lineageTag: ad7d275e-bdfe-4cc4-863e-9d35d1dcf3e1
 
 	/// Average attempts per response.
 	measure 'Avg Attempts' = AVERAGE(fact_response[attempts])
 		formatString: 0.0
+		lineageTag: 4304a48e-4aec-41ef-af8a-7611568bccc7
 
 	/// Share of responses correct on first attempt.
 	measure 'First-Correct %' = DIVIDE(CALCULATE(COUNTROWS(fact_response), fact_response[first_is_correct] = TRUE()), COUNTROWS(fact_response))
 		formatString: 0.0%
+		lineageTag: 1a897747-0c38-4c44-b6d8-2d36a8197e09
 
 	column response_id
 		dataType: string
-		isHidden
+		lineageTag: 0fdaf5cf-706c-4bdb-8cbe-e1e0fac8302d
+		sourceLineageTag: response_id
 		summarizeBy: none
 		sourceColumn: response_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column submission_id
 		dataType: string
-		isHidden
+		lineageTag: 1031453a-66f4-4f45-9b81-f6500bb538de
+		sourceLineageTag: submission_id
 		summarizeBy: none
 		sourceColumn: submission_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column user_id
 		dataType: string
-		isHidden
+		lineageTag: d49ae376-2c14-47b9-ade9-93d1e27bb888
+		sourceLineageTag: user_id
 		summarizeBy: none
 		sourceColumn: user_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column exercise_id
 		dataType: string
-		isHidden
+		lineageTag: 59b1a3b3-264c-441c-a43b-ce5700c33b6e
+		sourceLineageTag: exercise_id
 		summarizeBy: none
 		sourceColumn: exercise_id
 
+		annotation SummarizationSetBy = Automatic
+
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: 7bc0b3ed-97e0-4b06-9d63-20ee6e4bb0de
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column language_code
 		dataType: string
-		isHidden
+		lineageTag: 7fe1e449-4aee-442b-9d52-8f85a9816f13
+		sourceLineageTag: language_code
 		summarizeBy: none
 		sourceColumn: language_code
 
+		annotation SummarizationSetBy = Automatic
+
 	column cefr_level
 		dataType: string
-		isHidden
+		lineageTag: 181aa200-1c5e-408c-8165-68237e2906de
+		sourceLineageTag: cefr_level
 		summarizeBy: none
 		sourceColumn: cefr_level
 
+		annotation SummarizationSetBy = Automatic
+
 	column exercise_type
 		dataType: string
+		lineageTag: fe6a6422-c5b5-45ba-86f1-db02c120bf8a
+		sourceLineageTag: exercise_type
 		summarizeBy: none
 		sourceColumn: exercise_type
 
+		annotation SummarizationSetBy = Automatic
+
 	column first_score
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 0d0ff23c-37ed-48e9-bb2b-9db38edab57b
+		sourceLineageTag: first_score
+		summarizeBy: sum
 		sourceColumn: first_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column first_is_correct
 		dataType: boolean
-		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ed670e13-50b1-4a78-bcb6-ad69ac224987
+		sourceLineageTag: first_is_correct
 		summarizeBy: none
 		sourceColumn: first_is_correct
 
+		annotation SummarizationSetBy = Automatic
+
 	column final_score
 		dataType: double
-		isHidden
-		summarizeBy: none
+		lineageTag: 454eae96-e713-4114-b649-7fc1c8cd575d
+		sourceLineageTag: final_score
+		summarizeBy: sum
 		sourceColumn: final_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column final_is_correct
 		dataType: boolean
-		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b8e6d2b1-22ca-4802-abad-1ad523ee4dd3
+		sourceLineageTag: final_is_correct
 		summarizeBy: none
 		sourceColumn: final_is_correct
 
+		annotation SummarizationSetBy = Automatic
+
 	column attempts
 		dataType: int64
-		isHidden
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 228a2da6-5a86-4d7f-b1e5-57501f0a68ef
+		sourceLineageTag: attempts
+		summarizeBy: sum
 		sourceColumn: attempts
+
+		annotation SummarizationSetBy = Automatic
 
 	partition fact_response = entity
 		mode: directLake
@@ -95,3 +148,4 @@ table fact_response
 			entityName: fact_response
 			schemaName: dbo
 			expressionSource: DirectLake
+

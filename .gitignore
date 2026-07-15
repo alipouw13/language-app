@@ -87,3 +87,10 @@ azureconfig.json
 _tmp_*
 *.tmp
 scratch_*
+
+# Power BI Project (PBIP) local, machine-specific settings & cache — never commit
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/cache.abf
+**/*.Report/.pbi/
+**/*.SemanticModel/.pbi/

@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "overview_page_c0",
   "position": {
-    "x": 166,
-    "y": 232,
-    "z": 2,
-    "width": 356,
-    "height": 218,
-    "tabOrder": 2
+    "x": 166.06199770378876,
+    "y": 263.788748564868,
+    "z": 3000,
+    "height": 185.9012629161883,
+    "width": 355.63719862227327,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "lineClusteredColumnComboChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_date.month_name",
               "nativeQueryRef": "month_name",
-              "displayName": "Month",
-              "active": true
+              "active": true,
+              "displayName": "Month"
             }
           ]
         },
@@ -69,24 +69,6 @@
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dim_date"
-                  }
-                },
-                "Property": "month_name"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "visualContainerObjects": {
@@ -123,5 +105,51 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "5a0412f8877d95adc541",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_date"
+              }
+            },
+            "Property": "month_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "9ca68417a0367cd4b6aa",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_submission"
+              }
+            },
+            "Property": "Submissions"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "a3343d271cbe867279d9",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_submission"
+              }
+            },
+            "Property": "Avg Final Score"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

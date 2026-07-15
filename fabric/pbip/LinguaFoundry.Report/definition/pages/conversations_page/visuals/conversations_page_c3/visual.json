@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_c3",
   "position": {
-    "x": 166,
-    "y": 466,
-    "z": 2,
-    "width": 356,
-    "height": 236,
-    "tabOrder": 2
+    "x": 166.06199770378876,
+    "y": 492.30769230769232,
+    "z": 6000,
+    "height": 209.41446613088405,
+    "width": 355.63719862227327,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "columnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_date.month_name",
               "nativeQueryRef": "month_name",
-              "displayName": "Month",
-              "active": true
+              "active": true,
+              "displayName": "Month"
             }
           ]
         },
@@ -67,8 +67,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": true
+        ]
       }
     },
     "visualContainerObjects": {
@@ -105,5 +104,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "19a9ce0f2e95d3c3d53e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_date"
+              }
+            },
+            "Property": "month_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "ca49d4d0f417cb6cc518",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_conversation"
+              }
+            },
+            "Property": "Avg Minutes"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

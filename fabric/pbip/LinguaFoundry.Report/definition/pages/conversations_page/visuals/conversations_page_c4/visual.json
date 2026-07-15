@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_c4",
   "position": {
-    "x": 532,
-    "y": 466,
-    "z": 2,
-    "width": 356,
-    "height": 236,
-    "tabOrder": 2
+    "x": 531.98622273249146,
+    "y": 492.30769230769232,
+    "z": 7000,
+    "height": 209.41446613088405,
+    "width": 356.37198622273252,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_language.language_name",
               "nativeQueryRef": "language_name",
-              "displayName": "Language",
-              "active": true
+              "active": true,
+              "displayName": "Language"
             }
           ]
         },
@@ -87,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "1bfe79589f54faf37c5e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_language"
+              }
+            },
+            "Property": "language_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "5d219b21df3aab7af633",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_conversation"
+              }
+            },
+            "Property": "News-Grounded Chats"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

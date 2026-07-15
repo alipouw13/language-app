@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_brand",
   "position": {
     "x": 14,
     "y": 18,
-    "z": 2,
-    "width": 128,
+    "z": 2000,
     "height": 30,
-    "tabOrder": 2
+    "width": 128,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "shape",

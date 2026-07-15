@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "conversations_page_slc0",
   "position": {
     "x": 166,
     "y": 64,
-    "z": 3,
-    "width": 206,
+    "z": 20000,
     "height": 56,
-    "tabOrder": 3
+    "width": 206,
+    "tabOrder": 20000
   },
   "visual": {
     "visualType": "slicer",
@@ -28,11 +28,27 @@
               },
               "queryRef": "dim_language.language_name",
               "nativeQueryRef": "language_name",
+              "active": true,
               "displayName": "Language"
             }
           ]
         }
       }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "visualContainerObjects": {
       "background": [
@@ -68,5 +84,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "96ccd5e80dac77b0cc22",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_language"
+              }
+            },
+            "Property": "language_name"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

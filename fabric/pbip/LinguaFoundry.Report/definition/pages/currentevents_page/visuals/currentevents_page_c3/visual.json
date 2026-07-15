@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_c3",
   "position": {
-    "x": 166,
-    "y": 466,
-    "z": 2,
-    "width": 356,
-    "height": 236,
-    "tabOrder": 2
+    "x": 166.06199770378876,
+    "y": 484.9598163030999,
+    "z": 6000,
+    "height": 216.76234213547647,
+    "width": 355.63719862227327,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "columnChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "dim_date.month_name",
               "nativeQueryRef": "month_name",
-              "displayName": "Month",
-              "active": true
+              "active": true,
+              "displayName": "Month"
             }
           ]
         },
@@ -51,24 +51,6 @@
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dim_date"
-                  }
-                },
-                "Property": "month_name"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "visualContainerObjects": {
@@ -105,5 +87,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "7210d64e8004f277df03",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_date"
+              }
+            },
+            "Property": "month_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "a5b1bf33fde2bfbd3b52",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_news_engagement"
+              }
+            },
+            "Property": "News Engagements"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

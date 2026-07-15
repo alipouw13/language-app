@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "currentevents_page_c2",
   "position": {
-    "x": 898,
-    "y": 232,
-    "z": 2,
-    "width": 366,
-    "height": 218,
-    "tabOrder": 2
+    "x": 897.91044776119406,
+    "y": 257.91044776119406,
+    "z": 5000,
+    "height": 191.77956371986224,
+    "width": 365.92422502870266,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -28,8 +28,8 @@
               },
               "queryRef": "fact_news_engagement.domain",
               "nativeQueryRef": "domain",
-              "displayName": "Domain",
-              "active": true
+              "active": true,
+              "displayName": "Domain"
             }
           ]
         },
@@ -105,5 +105,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "9fc3dcd740aaa9f199c9",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_news_engagement"
+              }
+            },
+            "Property": "domain"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "e21304aa602b18210e51",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_news_engagement"
+              }
+            },
+            "Property": "News Engagements"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

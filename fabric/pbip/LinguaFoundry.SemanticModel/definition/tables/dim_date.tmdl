@@ -1,67 +1,125 @@
 table dim_date
+	lineageTag: 170cab1c-760f-4fd8-8cb0-6e64794bc180
+	sourceLineageTag: [dbo].[dim_date]
 
 	column date_key
 		dataType: int64
-		isHidden
+		formatString: 0
+		lineageTag: 799db258-b54c-4dea-9e37-77e9b2e28cbf
+		sourceLineageTag: date_key
 		summarizeBy: none
 		sourceColumn: date_key
 
+		annotation SummarizationSetBy = Automatic
+
 	column date
 		dataType: string
+		lineageTag: 9146e1bb-9659-4fb4-8014-3414df9f3879
+		sourceLineageTag: date
 		summarizeBy: none
 		sourceColumn: date
 
+		annotation SummarizationSetBy = Automatic
+
 	column year
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 19abee48-9016-4a6a-8aab-38692da08d34
+		sourceLineageTag: year
+		summarizeBy: sum
 		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
 
 	column quarter
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 191eccfe-f316-45ac-a191-2e0295e61d40
+		sourceLineageTag: quarter
+		summarizeBy: sum
 		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
 
 	column month
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 8981deb7-c297-4f98-9636-9878db9caf37
+		sourceLineageTag: month
+		summarizeBy: sum
 		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
 
 	column month_name
 		dataType: string
+		lineageTag: 317656c3-2ca4-41bb-bd79-b2438496e402
+		sourceLineageTag: month_name
 		summarizeBy: none
 		sourceColumn: month_name
 		sortByColumn: month
 
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
 	column month_year
 		dataType: string
+		lineageTag: dea7af3b-ac98-4aef-ad9d-ea4ae64b7e88
+		sourceLineageTag: month_year
 		summarizeBy: none
 		sourceColumn: month_year
 
+		annotation SummarizationSetBy = Automatic
+
 	column day
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 62d8e154-a4aa-4e76-b863-1f4ca1bd2f61
+		sourceLineageTag: day
+		summarizeBy: sum
 		sourceColumn: day
+
+		annotation SummarizationSetBy = Automatic
 
 	column day_of_week
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 3f9fc366-c424-4f02-9a6a-ce6234d8b05d
+		sourceLineageTag: day_of_week
+		summarizeBy: sum
 		sourceColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
 
 	column day_name
 		dataType: string
+		lineageTag: 2a315c54-6ae8-4d57-a9f4-00e31d64c128
+		sourceLineageTag: day_name
 		summarizeBy: none
 		sourceColumn: day_name
-		sortByColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
 
 	column week_of_year
 		dataType: int64
-		summarizeBy: none
+		formatString: 0
+		lineageTag: 90da6794-912d-461a-a413-9267e57a3a21
+		sourceLineageTag: week_of_year
+		summarizeBy: sum
 		sourceColumn: week_of_year
+
+		annotation SummarizationSetBy = Automatic
 
 	column is_weekend
 		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a8587f78-cba1-414c-b96a-2e228ae36c7f
+		sourceLineageTag: is_weekend
 		summarizeBy: none
 		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
 
 	partition dim_date = entity
 		mode: directLake
@@ -69,3 +127,4 @@ table dim_date
 			entityName: dim_date
 			schemaName: dbo
 			expressionSource: DirectLake
+

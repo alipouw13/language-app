@@ -3,6 +3,10 @@ model Model
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	discourageImplicitMeasures
 	sourceQueryCulture: en-US
+	directLakeBehavior: directLakeOnly
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
 
 ref table dim_user
 ref table dim_date
